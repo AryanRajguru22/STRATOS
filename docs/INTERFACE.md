@@ -219,7 +219,7 @@ python scripts/generate_results.py
 ```
 python -m venv .venv
 .venv\Scripts\activate            # Windows
-pip install -r requirements.txt   # streamlit, pandas, pytest
+pip install -r requirements.txt   # streamlit, pandas, plotly, pytest
 python -m pytest -q               # engine and integration tests (pytest.ini puts the repo root on the path)
 ```
 

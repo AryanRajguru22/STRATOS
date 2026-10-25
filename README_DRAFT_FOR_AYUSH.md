@@ -27,19 +27,7 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-**Known gap, not yet fixed in `requirements.txt`:** the frontend (`app_helpers.py`) imports
-`plotly.express` / `plotly.graph_objects` for every chart on all four tabs, but `requirements.txt`
-currently lists only `streamlit>=1.30`, `pandas>=2.0`, `pytest>=7.0`. I verified in an isolated,
-throwaway virtual environment that installing exactly `requirements.txt` and then running
-`streamlit run app.py` fails with `ModuleNotFoundError: No module named 'plotly'`; adding
-`plotly>=5.0` to `requirements.txt` resolved it and all 146 tests passed afterward. I have **not**
-edited `requirements.txt` myself since Aryan owns it -- the exact one-line patch is in my message to
-Harsh for Aryan to review and apply. Until that's merged, run:
-
-```powershell
-pip install -r requirements.txt
-pip install plotly
-```
+Plotly is now declared in `requirements.txt` (`plotly>=5.0`, added in commit 859a798), so this single install command is all that is needed -- no separate `pip install plotly` step.
 
 ## 3. Running the app
 
@@ -138,6 +126,5 @@ and that badge is confirmed absent when the real engine is active.
 - Only unilateral deviations are checked; coalition-proofness is out of scope.
 - Exhaustive equilibrium enumeration is exponential in student count and capped at 100,000 profiles
   in the engine; the UI doesn't expose it (see Section 6).
-- `requirements.txt` is currently missing `plotly` (Section 2) -- pending Aryan's review.
 - `README.md`, the test plan/log, oracle checks, report, slides, and screenshots are not yet created
   (Ayush's deliverables per the team plan).
