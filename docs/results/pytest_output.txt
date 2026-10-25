@@ -1,0 +1,10 @@
+command: python -m pytest -q -p no:cacheprovider
+generated: 2026-10-25 20:22:17 +0530
+python: 3.11.9  platform: Windows-10-10.0.26300-SP0
+git commit: 52f0e6afbc86a61076e3eb64a0b8702d49238513  branch: feat/engine
+git note: working tree clean: results describe exactly this commit
+exit code: 0
+--- output ---
+........................................................................ [ 56%]
+................................................s......                  [100%]
+126 passed, 1 skipped in 14.24s

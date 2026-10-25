@@ -1,0 +1,10 @@
+STRATOS exhaustive enumeration timing (measured, not estimated)
+command: python scripts/generate_results.py  (runs: python game_engine.py --report)
+generated: 2026-10-25 20:22:17 +0530
+python: 3.11.9  platform: Windows-10-10.0.26300-SP0
+git commit: 52f0e6afbc86a61076e3eb64a0b8702d49238513  (working tree clean: results describe exactly this commit)
+what: enumerate_equilibria(default scenario, with_analysis=True), wall clock, perf_counter
+profiles enumerated per run: 6561
+runs (seconds): [0.1179, 0.1121, 0.1122, 0.1119, 0.1144]
+min: 0.1119 s   median: 0.1122 s
+Timings vary between machines and runs; treat them as indicative of this machine only.
