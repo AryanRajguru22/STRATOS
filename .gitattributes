@@ -1,0 +1,3 @@
+# Binary deliverables must never go through line-ending conversion (core.autocrlf)
+*.pdf binary
+*.png binary
