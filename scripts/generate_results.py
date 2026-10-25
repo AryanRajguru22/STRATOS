@@ -6,6 +6,7 @@ Writes:
   docs/results/engine_report.json   output of  python game_engine.py --report --out ...  plus git provenance
   docs/results/pytest_output.txt    full output of  python -m pytest -q
   docs/results/timing.txt           enumeration timing read from the report (5 timed runs)
+  docs/results/independent_crosscheck_output.txt   output of  python scripts/independent_crosscheck.py --compare
 
 Provenance records the commit hash AND whether uncommitted changes existed, because results generated before a
 commit describe the working tree, not the hash. The exit status is non-zero if the tests fail.
@@ -79,9 +80,20 @@ def main():
         f.write(f"runs (seconds): {t['runs_seconds']}\nmin: {t['min_seconds']} s   median: {t['median_seconds']} s\n")
         f.write("Timings vary between machines and runs; treat them as indicative of this machine only.\n")
 
+    # 4. independent cross-check (its own code path, written from MODEL.md) diffed against the engine
+    cross = run(PY, os.path.join("scripts", "independent_crosscheck.py"), "--compare")
+    with open(os.path.join(OUT, "independent_crosscheck_output.txt"), "w", encoding="utf-8", newline="\n") as f:
+        f.write("command: python scripts/independent_crosscheck.py --compare\n")
+        f.write(f"generated: {now}\npython: {platform.python_version()}\n")
+        f.write(f"git commit: {info['commit']}  ({info['note']})\n")
+        f.write(f"exit code: {cross.returncode}\n--- output ---\n{cross.stdout}")
+        if cross.stderr.strip():
+            f.write(f"--- stderr ---\n{cross.stderr}")
+
     print(f"engine report, pytest output (exit code {tests.returncode}) and timing written to docs/results/")
     print(tests.stdout.strip().splitlines()[-1] if tests.stdout.strip() else "(no pytest output)")
-    return tests.returncode
+    print(cross.stdout.strip().splitlines()[-1] if cross.stdout.strip() else "(no cross-check output)")
+    return tests.returncode or cross.returncode
 
 
 if __name__ == "__main__":
