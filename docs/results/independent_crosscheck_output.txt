@@ -1,0 +1,21 @@
+command: python scripts/independent_crosscheck.py --compare
+generated: 2026-10-26 02:11:39 +0530
+python: 3.11.9
+git commit: 34e2007e01e5148b6c838e614ad6980c858eb7a5  (working tree clean: results describe exactly this commit)
+exit code: 0
+--- output ---
+STRATOS independent cross-check (computed without game_engine)
+tiny hand-derived table reproduced: True 
+profiles enumerated: 6561 (= 3^8)
+pure Nash equilibria: 23   distinct equilibrium welfares: [16, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29]
+welfare optimum: 29 at [(0, 0, 1, 0, 1, 1, 2, 2), (0, 0, 1, 0, 2, 1, 2, 2)]  (optimum is an equilibrium: [False, True])
+welfare gaps (best/worst equilibrium): 0 / 13
+price of stability: 1 = 1.0
+price of anarchy:   29/16 = 1.8125
+Pareto-optimal equilibria: 20 of 23
+potential maximum: 49 at [(0, 0, 1, 0, 2, 1, 2, 1), (0, 0, 1, 0, 2, 1, 2, 2)]
+welfare closed form == sum of utilities on all profiles: True
+exact-potential identity on every profile x deviation: True
+round-robin dynamics from all 6561 starts: {'all_converge_to_nash': True, 'max_moves': 13, 'distinct_terminal_profiles': 23, 'terminals_subset_of_equilibria': True}
+demo start (0, 0, 0, 1, 1, 1, 2, 2): 2 profitable deviations; round-robin ends at ((0, 0, 1, 0, 2, 1, 2, 2), 4, True)
+comparison with game_engine: IDENTICAL

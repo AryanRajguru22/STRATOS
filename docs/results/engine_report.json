@@ -9,19 +9,19 @@
       "what": "enumerate_equilibria(default scenario, with_analysis=True), wall clock, perf_counter",
       "n_profiles": 6561,
       "runs_seconds": [
-        0.1179,
-        0.1121,
-        0.1122,
-        0.1119,
-        0.1144
+        0.1233,
+        0.1439,
+        0.1207,
+        0.1197,
+        0.1194
       ],
-      "min_seconds": 0.1119,
-      "median_seconds": 0.1122
+      "min_seconds": 0.1194,
+      "median_seconds": 0.1207
     },
-    "generated_at": "2026-10-25 20:22:17 +0530",
+    "generated_at": "2026-10-26 02:11:39 +0530",
     "git": {
-      "commit": "52f0e6afbc86a61076e3eb64a0b8702d49238513",
-      "branch": "feat/engine",
+      "commit": "34e2007e01e5148b6c838e614ad6980c858eb7a5",
+      "branch": "release/final-product",
       "uncommitted_paths": 0,
       "note": "working tree clean: results describe exactly this commit"
     }
