@@ -1,0 +1,1635 @@
+{
+  "note": "All student data and model weights are fictional and synthetic; chosen to make strategic behaviour visible.",
+  "meta": {
+    "interface_version": "1.0",
+    "command": "python game_engine.py --report",
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26300-SP0",
+    "timing": {
+      "what": "enumerate_equilibria(default scenario, with_analysis=True), wall clock, perf_counter",
+      "n_profiles": 6561,
+      "runs_seconds": [
+        0.1179,
+        0.1121,
+        0.1122,
+        0.1119,
+        0.1144
+      ],
+      "min_seconds": 0.1119,
+      "median_seconds": 0.1122
+    },
+    "generated_at": "2026-10-25 20:22:17 +0530",
+    "git": {
+      "commit": "52f0e6afbc86a61076e3eb64a0b8702d49238513",
+      "branch": "feat/engine",
+      "uncommitted_paths": 0,
+      "note": "working tree clean: results describe exactly this commit"
+    }
+  },
+  "scenario": {
+    "students": [
+      "Asha",
+      "Bram",
+      "Chen",
+      "Dara",
+      "Eli",
+      "Farah",
+      "Goran",
+      "Hana"
+    ],
+    "projects": [
+      "Campus Navigation App",
+      "Wellbeing Survey Analysis",
+      "Event Management Portal"
+    ],
+    "pref": [
+      [
+        8,
+        6,
+        2
+      ],
+      [
+        9,
+        1,
+        5
+      ],
+      [
+        3,
+        9,
+        4
+      ],
+      [
+        7,
+        3,
+        8
+      ],
+      [
+        9,
+        2,
+        6
+      ],
+      [
+        4,
+        8,
+        3
+      ],
+      [
+        2,
+        5,
+        9
+      ],
+      [
+        6,
+        7,
+        5
+      ]
+    ],
+    "w": [
+      [
+        0,
+        0,
+        1,
+        3,
+        1,
+        0,
+        2,
+        1
+      ],
+      [
+        0,
+        0,
+        2,
+        2,
+        0,
+        1,
+        1,
+        2
+      ],
+      [
+        1,
+        2,
+        0,
+        1,
+        3,
+        0,
+        0,
+        1
+      ],
+      [
+        3,
+        2,
+        1,
+        0,
+        1,
+        2,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        3,
+        1,
+        0,
+        2,
+        2,
+        1
+      ],
+      [
+        0,
+        1,
+        0,
+        2,
+        2,
+        0,
+        1,
+        0
+      ],
+      [
+        2,
+        1,
+        0,
+        0,
+        2,
+        1,
+        0,
+        2
+      ],
+      [
+        1,
+        2,
+        1,
+        1,
+        1,
+        0,
+        2,
+        0
+      ]
+    ],
+    "gamma": 2,
+    "skills": {
+      "Asha": [
+        "Programming",
+        "Analysis"
+      ],
+      "Bram": [
+        "Programming"
+      ],
+      "Chen": [
+        "Analysis",
+        "Communication"
+      ],
+      "Dara": [
+        "Design",
+        "Communication"
+      ],
+      "Eli": [
+        "Programming",
+        "Design"
+      ],
+      "Farah": [
+        "Analysis"
+      ],
+      "Goran": [
+        "Communication"
+      ],
+      "Hana": [
+        "Design",
+        "Analysis"
+      ]
+    }
+  },
+  "enumeration": {
+    "n_profiles": 6561,
+    "n_equilibria": 23,
+    "equilibria": [
+      {
+        "profile": [
+          0,
+          0,
+          1,
+          0,
+          2,
+          1,
+          2,
+          1
+        ],
+        "utilities": [
+          3,
+          3,
+          2,
+          4,
+          6,
+          0,
+          9,
+          0
+        ],
+        "welfare": 27,
+        "potential": 49,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          0,
+          0,
+          1,
+          0,
+          2,
+          1,
+          2,
+          2
+        ],
+        "utilities": [
+          3,
+          3,
+          7,
+          4,
+          1,
+          6,
+          5,
+          0
+        ],
+        "welfare": 29,
+        "potential": 49,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          0,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          1
+        ],
+        "utilities": [
+          1,
+          1,
+          2,
+          6,
+          2,
+          0,
+          7,
+          0
+        ],
+        "welfare": 19,
+        "potential": 47,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          0,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          2
+        ],
+        "utilities": [
+          1,
+          1,
+          7,
+          1,
+          2,
+          6,
+          3,
+          0
+        ],
+        "welfare": 21,
+        "potential": 47,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          0,
+          0,
+          1,
+          2,
+          2,
+          1,
+          2,
+          0
+        ],
+        "utilities": [
+          1,
+          3,
+          7,
+          1,
+          1,
+          6,
+          3,
+          1
+        ],
+        "welfare": 23,
+        "potential": 47,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          0,
+          2,
+          1,
+          0,
+          0,
+          1,
+          2,
+          2
+        ],
+        "utilities": [
+          4,
+          0,
+          7,
+          3,
+          3,
+          6,
+          4,
+          1
+        ],
+        "welfare": 28,
+        "potential": 48,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          0,
+          2,
+          1,
+          0,
+          2,
+          1,
+          2,
+          0
+        ],
+        "utilities": [
+          4,
+          -2,
+          7,
+          3,
+          0,
+          6,
+          4,
+          0
+        ],
+        "welfare": 22,
+        "potential": 44,
+        "pareto_optimal": false
+      },
+      {
+        "profile": [
+          0,
+          2,
+          1,
+          2,
+          0,
+          1,
+          0,
+          2
+        ],
+        "utilities": [
+          3,
+          1,
+          7,
+          3,
+          4,
+          6,
+          -2,
+          0
+        ],
+        "welfare": 22,
+        "potential": 42,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          0,
+          2,
+          1,
+          2,
+          0,
+          1,
+          1,
+          2
+        ],
+        "utilities": [
+          7,
+          1,
+          1,
+          3,
+          8,
+          1,
+          -2,
+          0
+        ],
+        "welfare": 19,
+        "potential": 42,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          0,
+          2,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0
+        ],
+        "utilities": [
+          2,
+          0,
+          7,
+          2,
+          3,
+          6,
+          2,
+          0
+        ],
+        "welfare": 22,
+        "potential": 46,
+        "pareto_optimal": false
+      },
+      {
+        "profile": [
+          0,
+          2,
+          1,
+          2,
+          2,
+          1,
+          0,
+          0
+        ],
+        "utilities": [
+          3,
+          -1,
+          7,
+          3,
+          -1,
+          6,
+          -2,
+          1
+        ],
+        "welfare": 16,
+        "potential": 38,
+        "pareto_optimal": false
+      },
+      {
+        "profile": [
+          0,
+          2,
+          2,
+          2,
+          0,
+          1,
+          1,
+          1
+        ],
+        "utilities": [
+          7,
+          1,
+          -1,
+          3,
+          8,
+          1,
+          0,
+          1
+        ],
+        "welfare": 20,
+        "potential": 41,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          0,
+          0,
+          2,
+          0,
+          1,
+          2,
+          1
+        ],
+        "utilities": [
+          -1,
+          3,
+          0,
+          6,
+          4,
+          0,
+          7,
+          0
+        ],
+        "welfare": 19,
+        "potential": 43,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          2,
+          2
+        ],
+        "utilities": [
+          -1,
+          3,
+          2,
+          2,
+          2,
+          0,
+          9,
+          5
+        ],
+        "welfare": 22,
+        "potential": 46,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          0,
+          1,
+          0,
+          0,
+          2,
+          2,
+          1
+        ],
+        "utilities": [
+          0,
+          3,
+          3,
+          2,
+          2,
+          2,
+          8,
+          1
+        ],
+        "welfare": 21,
+        "potential": 44,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          0,
+          1,
+          0,
+          2,
+          0,
+          2,
+          1
+        ],
+        "utilities": [
+          0,
+          4,
+          3,
+          3,
+          6,
+          -1,
+          9,
+          1
+        ],
+        "welfare": 25,
+        "potential": 45,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          0,
+          1,
+          0,
+          2,
+          1,
+          2,
+          0
+        ],
+        "utilities": [
+          -1,
+          5,
+          2,
+          2,
+          6,
+          0,
+          9,
+          1
+        ],
+        "welfare": 24,
+        "potential": 46,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          0,
+          1,
+          2,
+          0,
+          0,
+          2,
+          1
+        ],
+        "utilities": [
+          0,
+          2,
+          3,
+          6,
+          3,
+          -1,
+          7,
+          1
+        ],
+        "welfare": 21,
+        "potential": 45,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0
+        ],
+        "utilities": [
+          -1,
+          3,
+          2,
+          6,
+          2,
+          0,
+          7,
+          1
+        ],
+        "welfare": 20,
+        "potential": 46,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          0,
+          2,
+          2,
+          0,
+          0,
+          1,
+          1
+        ],
+        "utilities": [
+          1,
+          2,
+          3,
+          7,
+          3,
+          -1,
+          1,
+          2
+        ],
+        "welfare": 18,
+        "potential": 39,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          2,
+          1,
+          0,
+          0,
+          0,
+          2,
+          1
+        ],
+        "utilities": [
+          0,
+          4,
+          3,
+          2,
+          4,
+          0,
+          8,
+          1
+        ],
+        "welfare": 22,
+        "potential": 43,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          1,
+          2,
+          1,
+          0,
+          0,
+          0,
+          2,
+          2
+        ],
+        "utilities": [
+          5,
+          0,
+          8,
+          2,
+          4,
+          0,
+          4,
+          1
+        ],
+        "welfare": 24,
+        "potential": 43,
+        "pareto_optimal": true
+      },
+      {
+        "profile": [
+          2,
+          0,
+          1,
+          2,
+          0,
+          1,
+          2,
+          0
+        ],
+        "utilities": [
+          -1,
+          3,
+          7,
+          3,
+          2,
+          6,
+          3,
+          1
+        ],
+        "welfare": 24,
+        "potential": 46,
+        "pareto_optimal": true
+      }
+    ],
+    "optimal": {
+      "profile": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        2,
+        2
+      ],
+      "welfare": 29,
+      "utilities": [
+        3,
+        3,
+        4,
+        4,
+        -1,
+        2,
+        9,
+        5
+      ]
+    },
+    "optimal_profiles": [
+      [
+        0,
+        0,
+        1,
+        0,
+        1,
+        1,
+        2,
+        2
+      ],
+      [
+        0,
+        0,
+        1,
+        0,
+        2,
+        1,
+        2,
+        2
+      ]
+    ],
+    "welfare_gap_best_equilibrium": 0,
+    "welfare_gap_worst_equilibrium": 13,
+    "price_of_anarchy": 1.8125,
+    "price_of_stability": 1.0,
+    "potential_maximizers": {
+      "potential": 49,
+      "profiles": [
+        [
+          0,
+          0,
+          1,
+          0,
+          2,
+          1,
+          2,
+          1
+        ],
+        [
+          0,
+          0,
+          1,
+          0,
+          2,
+          1,
+          2,
+          2
+        ]
+      ],
+      "all_are_equilibria": true
+    }
+  },
+  "dynamics_summary": {
+    "round_robin": {
+      "n_runs": 200,
+      "seeds": "0..199",
+      "all_converged": true,
+      "all_final_profiles_pass_is_nash": true,
+      "all_final_profiles_in_enumerated_set": true,
+      "steps_min": 0,
+      "steps_mean": 5.44,
+      "steps_max": 13,
+      "rounds_max": 5,
+      "endpoints": [
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            0,
+            2,
+            1,
+            2,
+            1
+          ],
+          "count": 33
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            0,
+            2,
+            1,
+            2,
+            2
+          ],
+          "count": 15
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            2,
+            0,
+            1,
+            2,
+            1
+          ],
+          "count": 18
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            2,
+            0,
+            1,
+            2,
+            2
+          ],
+          "count": 5
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            2,
+            2,
+            1,
+            2,
+            0
+          ],
+          "count": 28
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            0,
+            0,
+            1,
+            2,
+            2
+          ],
+          "count": 14
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            0,
+            2,
+            1,
+            2,
+            0
+          ],
+          "count": 6
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            2,
+            0,
+            1,
+            1,
+            2
+          ],
+          "count": 2
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            2,
+            0,
+            1,
+            2,
+            0
+          ],
+          "count": 29
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            2,
+            2,
+            1,
+            0,
+            0
+          ],
+          "count": 7
+        },
+        {
+          "profile": [
+            0,
+            2,
+            2,
+            2,
+            0,
+            1,
+            1,
+            1
+          ],
+          "count": 4
+        },
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            2,
+            0,
+            1,
+            2,
+            1
+          ],
+          "count": 3
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            2,
+            2
+          ],
+          "count": 6
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            0,
+            2,
+            2,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            2,
+            1,
+            2,
+            0
+          ],
+          "count": 10
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            2,
+            0,
+            1,
+            2,
+            0
+          ],
+          "count": 11
+        },
+        {
+          "profile": [
+            1,
+            2,
+            1,
+            0,
+            0,
+            0,
+            2,
+            1
+          ],
+          "count": 3
+        },
+        {
+          "profile": [
+            1,
+            2,
+            1,
+            0,
+            0,
+            0,
+            2,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "profile": [
+            2,
+            0,
+            1,
+            2,
+            0,
+            1,
+            2,
+            0
+          ],
+          "count": 3
+        }
+      ]
+    },
+    "random": {
+      "n_runs": 200,
+      "seeds": "0..199",
+      "all_converged": true,
+      "all_final_profiles_pass_is_nash": true,
+      "all_final_profiles_in_enumerated_set": true,
+      "steps_min": 0,
+      "steps_mean": 5.47,
+      "steps_max": 11,
+      "rounds_max": 5,
+      "endpoints": [
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            0,
+            2,
+            1,
+            2,
+            1
+          ],
+          "count": 28
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            0,
+            2,
+            1,
+            2,
+            2
+          ],
+          "count": 10
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            2,
+            0,
+            1,
+            2,
+            1
+          ],
+          "count": 24
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            2,
+            0,
+            1,
+            2,
+            2
+          ],
+          "count": 10
+        },
+        {
+          "profile": [
+            0,
+            0,
+            1,
+            2,
+            2,
+            1,
+            2,
+            0
+          ],
+          "count": 23
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            0,
+            0,
+            1,
+            2,
+            2
+          ],
+          "count": 27
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            0,
+            2,
+            1,
+            2,
+            0
+          ],
+          "count": 8
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            2,
+            0,
+            1,
+            0,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            2,
+            0,
+            1,
+            1,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            2,
+            0,
+            1,
+            2,
+            0
+          ],
+          "count": 4
+        },
+        {
+          "profile": [
+            0,
+            2,
+            1,
+            2,
+            2,
+            1,
+            0,
+            0
+          ],
+          "count": 3
+        },
+        {
+          "profile": [
+            0,
+            2,
+            2,
+            2,
+            0,
+            1,
+            1,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "profile": [
+            1,
+            0,
+            0,
+            2,
+            0,
+            1,
+            2,
+            1
+          ],
+          "count": 4
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            2,
+            2
+          ],
+          "count": 6
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            0,
+            2,
+            2,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            1
+          ],
+          "count": 7
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            0,
+            2,
+            1,
+            2,
+            0
+          ],
+          "count": 15
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            2,
+            0,
+            0,
+            2,
+            1
+          ],
+          "count": 5
+        },
+        {
+          "profile": [
+            1,
+            0,
+            1,
+            2,
+            0,
+            1,
+            2,
+            0
+          ],
+          "count": 11
+        },
+        {
+          "profile": [
+            1,
+            0,
+            2,
+            2,
+            0,
+            0,
+            1,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "profile": [
+            1,
+            2,
+            1,
+            0,
+            0,
+            0,
+            2,
+            1
+          ],
+          "count": 2
+        },
+        {
+          "profile": [
+            1,
+            2,
+            1,
+            0,
+            0,
+            0,
+            2,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "profile": [
+            2,
+            0,
+            1,
+            2,
+            0,
+            1,
+            2,
+            0
+          ],
+          "count": 7
+        }
+      ]
+    }
+  },
+  "demo": {
+    "start_profile": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      2,
+      2
+    ],
+    "equilibrium_check": {
+      "is_nash": false,
+      "utilities": [
+        1,
+        3,
+        -2,
+        -2,
+        -3,
+        4,
+        9,
+        5
+      ],
+      "deviations": [
+        {
+          "student": 3,
+          "from_project": 1,
+          "to_project": 2,
+          "current_utility": -2,
+          "new_utility": 1,
+          "gain": 3
+        },
+        {
+          "student": 4,
+          "from_project": 1,
+          "to_project": 2,
+          "current_utility": -3,
+          "new_utility": 1,
+          "gain": 4
+        }
+      ]
+    },
+    "dynamics_round_robin": {
+      "converged": true,
+      "rounds": 3,
+      "start_profile": [
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        2,
+        2
+      ],
+      "final_profile": [
+        0,
+        0,
+        1,
+        0,
+        2,
+        1,
+        2,
+        2
+      ],
+      "steps": [
+        {
+          "step": 1,
+          "round": 1,
+          "student": 3,
+          "from_project": 1,
+          "to_project": 2,
+          "gain": 3,
+          "profile": [
+            0,
+            0,
+            0,
+            2,
+            1,
+            1,
+            2,
+            2
+          ],
+          "utilities": [
+            1,
+            3,
+            -2,
+            1,
+            2,
+            8,
+            3,
+            0
+          ],
+          "potential": 38,
+          "welfare": 16
+        },
+        {
+          "step": 2,
+          "round": 2,
+          "student": 2,
+          "from_project": 0,
+          "to_project": 1,
+          "gain": 6,
+          "profile": [
+            0,
+            0,
+            1,
+            2,
+            1,
+            1,
+            2,
+            2
+          ],
+          "utilities": [
+            6,
+            7,
+            4,
+            1,
+            -1,
+            2,
+            3,
+            0
+          ],
+          "potential": 44,
+          "welfare": 22
+        },
+        {
+          "step": 3,
+          "round": 2,
+          "student": 3,
+          "from_project": 2,
+          "to_project": 0,
+          "gain": 3,
+          "profile": [
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            2,
+            2
+          ],
+          "utilities": [
+            3,
+            3,
+            4,
+            4,
+            -1,
+            2,
+            9,
+            5
+          ],
+          "potential": 47,
+          "welfare": 29
+        },
+        {
+          "step": 4,
+          "round": 2,
+          "student": 4,
+          "from_project": 1,
+          "to_project": 2,
+          "gain": 2,
+          "profile": [
+            0,
+            0,
+            1,
+            0,
+            2,
+            1,
+            2,
+            2
+          ],
+          "utilities": [
+            3,
+            3,
+            7,
+            4,
+            1,
+            6,
+            5,
+            0
+          ],
+          "potential": 49,
+          "welfare": 29
+        }
+      ],
+      "is_nash_final": true
+    }
+  }
+}
