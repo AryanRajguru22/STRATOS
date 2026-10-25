@@ -440,6 +440,9 @@ def render_app_header(bundle: EngineBundle) -> None:
     )
     if not bundle.using_mock:
         st.success("Real engine detected: `game_engine.py` and `sample_data.py` loaded.", icon="✅")
+        notice = getattr(bundle.sample_data, "SYNTHETIC_DATA_NOTICE", None)
+        if notice:
+            st.caption(f"ℹ️ {notice}")
     else:
         st.info(
             "Running in **standalone frontend mode** -- "
