@@ -76,7 +76,7 @@ with st.sidebar:
         st.slider("Crowding parameter (gamma)", 0.0, 5.0, value=1.0, step=0.5, key="custom_gamma")
         st.number_input("Random seed", min_value=0, max_value=9999, value=42, key="custom_seed")
 
-    regenerate_clicked = st.button("\U0001f504 Regenerate scenario", use_container_width=True)
+    regenerate_clicked = st.button("\U0001f504 Regenerate scenario", width="stretch")
     need_init = "scenario" not in st.session_state or st.session_state.get("active_preset") != preset
     if regenerate_clicked or need_init:
         st.session_state.scenario = build_scenario(preset)
@@ -117,17 +117,17 @@ with tab_scenario:
     col_students, col_projects = st.columns(2)
     with col_students:
         st.markdown("**Students**")
-        st.dataframe(helpers.students_df(scenario), use_container_width=True, hide_index=True)
+        st.dataframe(helpers.students_df(scenario), width="stretch", hide_index=True)
     with col_projects:
         st.markdown("**Projects**")
-        st.dataframe(helpers.projects_df(scenario), use_container_width=True, hide_index=True)
+        st.dataframe(helpers.projects_df(scenario), width="stretch", hide_index=True)
         st.metric("Crowding parameter (gamma)", scenario["gamma"])
 
     st.markdown("**Preferences** -- higher is more preferred (0–10 scale).")
-    st.plotly_chart(helpers.preference_heatmap(scenario), use_container_width=True)
+    st.plotly_chart(helpers.preference_heatmap(scenario), width="stretch")
 
     st.markdown("**Teammate compatibility** -- symmetric, zero on the diagonal.")
-    st.plotly_chart(helpers.compatibility_heatmap(scenario), use_container_width=True)
+    st.plotly_chart(helpers.compatibility_heatmap(scenario), width="stretch")
     with st.expander("How to read these charts"):
         st.markdown(
             "The preference heatmap shows each student's reported value for each project. "
@@ -153,10 +153,10 @@ with tab_assignment:
     with control_cols[0]:
         assignment_seed = st.number_input("Seed", min_value=0, max_value=9999, value=1, key="assignment_seed", label_visibility="collapsed")
     with control_cols[1]:
-        if st.button("\U0001f3b2 Random", use_container_width=True):
+        if st.button("\U0001f3b2 Random", width="stretch"):
             set_profile(engine.random_profile(scenario, seed=assignment_seed))
     with control_cols[2]:
-        if st.button("↺ Reset", use_container_width=True):
+        if st.button("↺ Reset", width="stretch"):
             set_profile([0] * n_students)
 
     profile = st.session_state.profile
@@ -197,12 +197,12 @@ with tab_assignment:
     eval_cols = st.columns(2)
     with eval_cols[0]:
         st.markdown("**Teams by project**")
-        st.dataframe(helpers.teams_df(teams, scenario), use_container_width=True, hide_index=True)
+        st.dataframe(helpers.teams_df(teams, scenario), width="stretch", hide_index=True)
     with eval_cols[1]:
         st.markdown("**Utility per student**")
-        st.dataframe(helpers.utilities_df(profile, scenario, utilities), use_container_width=True, hide_index=True)
+        st.dataframe(helpers.utilities_df(profile, scenario, utilities), width="stretch", hide_index=True)
 
-    st.plotly_chart(helpers.utility_bar_chart(profile, scenario, utilities), use_container_width=True)
+    st.plotly_chart(helpers.utility_bar_chart(profile, scenario, utilities), width="stretch")
 
 # ---------------------------------------------------------------------------
 # Tab 3: Equilibrium
@@ -231,7 +231,7 @@ with tab_equilibrium:
             icon="⚖️",
         )
     else:
-        n_dev = len(result["deviations"])
+        n_dev = helpers.count_students_with_deviations(result["deviations"])
         st.warning(
             f"This assignment is **not stable** -- {n_dev} student(s) have a profitable "
             "unilateral move.",
@@ -244,7 +244,7 @@ with tab_equilibrium:
             f"to *{scenario['projects'][top['to_project']]}*."
         )
         st.markdown("**All profitable deviations**")
-        st.dataframe(helpers.deviations_df(result["deviations"], scenario), use_container_width=True, hide_index=True)
+        st.dataframe(helpers.deviations_df(result["deviations"], scenario), width="stretch", hide_index=True)
 
     with st.expander("What does 'stable' mean here?"):
         st.markdown(
@@ -309,7 +309,7 @@ with tab_simulation:
             )
 
         st.markdown("**Move-by-move trace**")
-        st.dataframe(helpers.dynamics_steps_df(result["steps"], scenario), use_container_width=True, hide_index=True)
+        st.dataframe(helpers.dynamics_steps_df(result["steps"], scenario), width="stretch", hide_index=True)
 
         if result["steps"]:
             step_idx = st.slider("Inspect profile after move #", 0, len(result["steps"]), value=len(result["steps"]))
@@ -317,12 +317,12 @@ with tab_simulation:
             st.markdown(f"**Teams after {step_idx} move(s)**")
             st.dataframe(
                 helpers.teams_df(engine.teams(step_profile, scenario), scenario),
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
 
         trace_df = helpers.replay_welfare_potential_trace(engine, scenario, result["start_profile"], result["steps"])
-        st.plotly_chart(helpers.dynamics_trace_chart(trace_df), use_container_width=True)
+        st.plotly_chart(helpers.dynamics_trace_chart(trace_df), width="stretch")
 
 st.divider()
 st.caption(

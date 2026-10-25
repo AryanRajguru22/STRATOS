@@ -13,6 +13,8 @@ future swap to the real engine has a known-correct baseline to compare
 against. None of this asserts anything about Aryan's real engine.
 """
 
+import builtins
+import importlib.util
 import os
 import sys
 
@@ -204,3 +206,145 @@ def test_charts_build_without_error():
     assert helpers.compatibility_heatmap(scenario) is not None
     assert helpers.utility_bar_chart(profile, scenario, utilities) is not None
     assert helpers.dynamics_trace_chart(trace_df) is not None
+
+
+# ---------------------------------------------------------------------------
+# Regression: distinct-student count vs. raw profitable-deviation count.
+#
+# The engine's `deviations` list has one entry per (student, target_project)
+# pair, so a student with two profitable moves contributes two entries.
+# app.py must display the number of distinct STUDENTS, not len(deviations).
+# These tests use the real engine directly (not the mock) -- there is no
+# ambiguity about which implementation is exercised.
+# ---------------------------------------------------------------------------
+
+def test_profitable_deviation_count_uses_distinct_students_not_entries():
+    import game_engine as ge
+    import sample_data as sd
+
+    # Student 0 can profitably move to EITHER P1 or P2 -- one student,
+    # two deviation entries.
+    scenario = {
+        "students": ["A", "B", "C"],
+        "projects": ["P0", "P1", "P2"],
+        "pref": [[1, 9, 8], [5, 5, 5], [5, 5, 5]],
+        "w": [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+        "gamma": 0,
+    }
+    result = ge.is_nash([0, 1, 2], scenario)
+
+    raw_entry_count = len(result["deviations"])
+    distinct_student_count = helpers.count_students_with_deviations(result["deviations"])
+
+    assert raw_entry_count == 2
+    assert distinct_student_count == 1
+    assert distinct_student_count != raw_entry_count
+
+    # The exact real-world case from the audit: default scenario, every
+    # student reset onto project 0 -- 16 deviation entries, 8 distinct
+    # students (each has exactly 2 profitable alternatives).
+    default_scenario = sd.get_default_scenario()
+    default_profile = [0] * len(default_scenario["students"])
+    default_result = ge.is_nash(default_profile, default_scenario)
+
+    assert len(default_result["deviations"]) == 16
+    assert helpers.count_students_with_deviations(default_result["deviations"]) == 8
+
+
+def test_equilibrium_tab_renders_distinct_student_count():
+    if helpers.load_engine_bundle().using_mock:
+        pytest.skip("requires the real game_engine/sample_data for the exact 8-vs-16 figures")
+
+    at = AppTest.from_file(APP_PATH)
+    at.run(timeout=30)
+    preset = [w for w in at.selectbox if w.key == "scenario_preset"][0]
+    preset.select("Default scenario").run(timeout=30)
+    reset_btn = [b for b in at.button if "Reset" in (b.label or "")][0]
+    reset_btn.click().run(timeout=30)
+
+    warning_texts = [w.value for w in at.warning]
+    assert any("8 student(s)" in text for text in warning_texts)
+    assert not any("16 student(s)" in text for text in warning_texts)
+    assert not at.exception
+
+
+# ---------------------------------------------------------------------------
+# Regression: real-vs-mock engine selection must never be ambiguous or
+# silent. Each test here uses pytest's `monkeypatch` fixture exclusively
+# for isolation (env vars and `builtins.__import__`/`importlib.util.find_spec`
+# are all restored automatically after the test, even on failure), so none
+# of this can leak into other tests.
+# ---------------------------------------------------------------------------
+
+def test_real_engine_loads_successfully_when_available():
+    """Asserts the real engine is used -- does not accept either outcome."""
+    bundle = helpers.load_engine_bundle()
+    assert bundle.using_mock is False
+    assert bundle.import_error is None
+    assert bundle.missing == []
+    assert bundle.engine.INTERFACE_VERSION == "1.0"
+
+
+def test_broken_but_present_engine_is_not_misreported_as_missing(monkeypatch):
+    real_import = builtins.__import__
+
+    def fake_import(name, *args, **kwargs):
+        if name == "game_engine":
+            raise RuntimeError("simulated: a bug broke game_engine's import")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+
+    bundle = helpers.load_engine_bundle()
+
+    assert bundle.using_mock is True
+    assert bundle.missing == []  # NOT genuinely absent -- must not be conflated
+    assert bundle.import_error is not None
+    assert "simulated" in str(bundle.import_error)
+
+
+def test_explicit_mock_fallback_when_genuinely_absent(monkeypatch):
+    real_find_spec = importlib.util.find_spec
+
+    def fake_find_spec(name, *args, **kwargs):
+        if name in ("game_engine", "sample_data"):
+            return None
+        return real_find_spec(name, *args, **kwargs)
+
+    monkeypatch.setattr(importlib.util, "find_spec", fake_find_spec)
+
+    bundle = helpers.load_engine_bundle()
+
+    assert bundle.using_mock is True
+    assert bundle.import_error is None
+    assert set(bundle.missing) == {"game_engine.py", "sample_data.py"}
+
+
+def test_strict_mode_raises_loudly_when_genuinely_absent(monkeypatch):
+    real_find_spec = importlib.util.find_spec
+
+    def fake_find_spec(name, *args, **kwargs):
+        if name in ("game_engine", "sample_data"):
+            return None
+        return real_find_spec(name, *args, **kwargs)
+
+    monkeypatch.setattr(importlib.util, "find_spec", fake_find_spec)
+    monkeypatch.setenv(helpers.REQUIRE_REAL_ENGINE_ENV, "1")
+
+    with pytest.raises(helpers.EngineUnavailableError):
+        helpers.load_engine_bundle()
+
+
+def test_strict_mode_raises_loudly_when_broken(monkeypatch):
+    real_import = builtins.__import__
+
+    def fake_import(name, *args, **kwargs):
+        if name == "game_engine":
+            raise RuntimeError("simulated break")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    monkeypatch.setenv(helpers.REQUIRE_REAL_ENGINE_ENV, "1")
+
+    with pytest.raises(helpers.EngineUnavailableError):
+        helpers.load_engine_bundle()

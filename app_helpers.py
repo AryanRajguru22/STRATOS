@@ -23,6 +23,7 @@ visibly labelled as such in the UI.
 from __future__ import annotations
 
 import importlib.util
+import os
 import random
 from dataclasses import dataclass, field
 from typing import Optional
@@ -73,8 +74,18 @@ EPS = 1e-9
 
 # ---------------------------------------------------------------------------
 # Engine bundle: real modules when importable, contract-mirroring mock
-# otherwise. The app must run standalone either way.
+# otherwise. The app must run standalone either way -- but "absent" and
+# "present but broken" must never be conflated, and a broken real engine
+# must never be swallowed silently (see REQUIRE_REAL_ENGINE_ENV below).
 # ---------------------------------------------------------------------------
+
+REQUIRE_REAL_ENGINE_ENV = "STRATOS_REQUIRE_REAL_ENGINE"
+
+
+class EngineUnavailableError(RuntimeError):
+    """Raised by load_engine_bundle() when STRATOS_REQUIRE_REAL_ENGINE is
+    set and the real engine cannot be loaded, whether absent or broken."""
+
 
 @dataclass(frozen=True)
 class EngineBundle:
@@ -82,12 +93,29 @@ class EngineBundle:
     sample_data: object
     using_mock: bool
     missing: list = field(default_factory=list)
+    import_error: Optional[BaseException] = None
+    """Set only when game_engine/sample_data were FOUND but raised during
+    import -- as opposed to `missing`, which means they were not found at
+    all. Keeping these separate is what lets the UI tell a genuine absence
+    apart from a real bug in an existing file."""
+
+
+def _require_real_engine() -> bool:
+    return os.environ.get(REQUIRE_REAL_ENGINE_ENV, "").strip().lower() in ("1", "true", "yes")
 
 
 def load_engine_bundle() -> EngineBundle:
-    """Use the real game_engine/sample_data when both import cleanly;
+    """Load the real game_engine/sample_data when they import cleanly;
     otherwise fall back to the contract-mirroring mock below. Never
-    guesses at behaviour beyond the documented contract."""
+    guesses at behaviour beyond the documented contract, and never
+    mislabels a broken-but-present engine as merely "not found yet".
+
+    Set STRATOS_REQUIRE_REAL_ENGINE=1 (or "true"/"yes") to turn ANY
+    fallback -- absent or broken -- into a loud EngineUnavailableError
+    instead of a silent mock. Default (unset): mock fallback is allowed,
+    but a broken import is always reported distinctly from an absent one.
+    """
+    require_real = _require_real_engine()
     game_engine_spec = importlib.util.find_spec("game_engine")
     sample_data_spec = importlib.util.find_spec("sample_data")
 
@@ -97,14 +125,31 @@ def load_engine_bundle() -> EngineBundle:
             import sample_data  # type: ignore
 
             return EngineBundle(engine=game_engine, sample_data=sample_data, using_mock=False, missing=[])
-        except Exception:
-            pass  # fall through to mock on any import-time failure
+        except Exception as exc:
+            if require_real:
+                raise EngineUnavailableError(
+                    f"{REQUIRE_REAL_ENGINE_ENV} is set, but game_engine/sample_data were found and "
+                    f"failed to import: {exc!r}"
+                ) from exc
+            return EngineBundle(
+                engine=_MockEngine,
+                sample_data=_MockSampleData,
+                using_mock=True,
+                missing=[],
+                import_error=exc,
+            )
 
     missing = []
     if game_engine_spec is None:
         missing.append("game_engine.py")
     if sample_data_spec is None:
         missing.append("sample_data.py")
+
+    if require_real:
+        raise EngineUnavailableError(
+            f"{REQUIRE_REAL_ENGINE_ENV} is set, but required module(s) were not found: {', '.join(missing)}"
+        )
+
     return EngineBundle(engine=_MockEngine, sample_data=_MockSampleData, using_mock=True, missing=missing)
 
 
@@ -443,6 +488,15 @@ def render_app_header(bundle: EngineBundle) -> None:
         notice = getattr(bundle.sample_data, "SYNTHETIC_DATA_NOTICE", None)
         if notice:
             st.caption(f"ℹ️ {notice}")
+    elif bundle.import_error is not None:
+        st.error(
+            "**`game_engine.py`/`sample_data.py` were found but failed to import** -- this is "
+            "almost certainly a bug, not an intentional absence. Falling back to the mock so the "
+            f"app can still run. Error: `{bundle.import_error!r}`",
+            icon="🛑",
+        )
+        with st.expander("Full import error"):
+            st.exception(bundle.import_error)
     else:
         st.info(
             "Running in **standalone frontend mode** -- "
@@ -497,6 +551,17 @@ def utilities_df(profile: list, scenario: dict, utilities: list) -> pd.DataFrame
             "Utility": utilities,
         }
     )
+
+
+def count_students_with_deviations(deviations: list) -> int:
+    """Number of distinct students with >=1 profitable deviation.
+
+    NOT the same as len(deviations): the engine's `deviations` list has one
+    entry per (student, target_project) pair, so a student with two
+    profitable moves (e.g. to two different projects) contributes two
+    entries. Counting entries overstates how many students are unhappy.
+    """
+    return len({d["student"] for d in deviations})
 
 
 def deviations_df(deviations: list, scenario: dict) -> pd.DataFrame:
