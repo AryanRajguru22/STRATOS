@@ -1,0 +1,334 @@
+{
+  "commit": "c94f918764f8f95133ed03ca3b19118d05e62b73",
+  "url": "http://localhost:8765",
+  "steps": [
+    {
+      "tabs_seen": [
+        "\ud83d\udccb Scenario",
+        "\ud83e\udd1d Assignment",
+        "\u2696\ufe0f Equilibrium",
+        "\ud83d\udd00 Simulation"
+      ],
+      "real_engine_banner": true,
+      "mock_badge_present": false
+    },
+    {
+      "file": "S1a_scenario_tiny_preset.png",
+      "tab": "Scenario",
+      "state": "Tiny hand-verified example (default on load)",
+      "expected_on_screen": [],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)  1",
+          "Social welfare W(s)8",
+          "Potential \u03a6(s)7"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0fThis assignment is not stable \u2014 1 student(s) have a profitable unilateral move.",
+          "\u2139\ufe0fRun dynamics to see how this assignment evolves."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S1b_scenario_default_preset.png",
+      "tab": "Scenario",
+      "state": "Default scenario: 8 students, 3 projects, gamma = 2",
+      "expected_on_screen": [],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)  2",
+          "Social welfare W(s)-670",
+          "Potential \u03a6(s)-199"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0fThis assignment is not stable \u2014 8 student(s) have a profitable unilateral move.",
+          "\u2139\ufe0fRun dynamics to see how this assignment evolves."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S2a_assignment_reset_all_project0.png",
+      "tab": "Assignment",
+      "state": "after Reset: all 8 students on project 0",
+      "expected_on_screen": [
+        "-670",
+        "-199"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)  -670",
+          "Potential \u03a6(s)  -199"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0fThis assignment is not stable \u2014 8 student(s) have a profitable unilateral move.",
+          "\u2139\ufe0fRun dynamics to see how this assignment evolves."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S2b_assignment_demo_start.png",
+      "tab": "Assignment",
+      "state": "demo start [0,0,0,1,1,1,2,2]",
+      "expected_on_screen": [
+        "15",
+        "35"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)  15",
+          "Potential \u03a6(s)  35"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0fThis assignment is not stable \u2014 2 student(s) have a profitable unilateral move.",
+          "\u2139\ufe0fRun dynamics to see how this assignment evolves."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S3_equilibrium_demo_start_unstable.png",
+      "tab": "Equilibrium",
+      "state": "demo start: 2 students have a profitable move",
+      "expected_on_screen": [
+        "not stable",
+        "2 student(s)"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)15",
+          "Potential \u03a6(s)35"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0f  This assignment is not stable \u2014 2 student(s) have a profitable unilateral move.",
+          "\u2139\ufe0fRun dynamics to see how this assignment evolves."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S4_simulation_round_robin.png",
+      "tab": "Simulation",
+      "state": "round_robin from demo start (sidebar default)",
+      "expected_on_screen": [
+        "Sweeps run 3",
+        "Moves made 4",
+        "Status Stable",
+        "pure Nash equilibrium"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)15",
+          "Potential \u03a6(s)35",
+          "Sweeps run  3",
+          "Moves made  4",
+          "Status  Stable"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0fThis assignment is not stable \u2014 2 student(s) have a profitable unilateral move.",
+          "\u2705  Re-verified: the final assignment is a pure Nash equilibrium."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S5_simulation_random_order_seed7.png",
+      "tab": "Simulation",
+      "state": "random order, dynamics seed 7, same demo start",
+      "expected_on_screen": [
+        "Moves made 4",
+        "Status Stable"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)15",
+          "Potential \u03a6(s)35",
+          "Sweeps run  4",
+          "Moves made  4",
+          "Status  Stable"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0fThis assignment is not stable \u2014 2 student(s) have a profitable unilateral move.",
+          "\u2705  Re-verified: the final assignment is a pure Nash equilibrium."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S6_assignment_worst_equilibrium_welfare16.png",
+      "tab": "Assignment",
+      "state": "worst equilibrium [0,2,1,2,2,1,0,0]: welfare 16, potential 38",
+      "expected_on_screen": [
+        "16",
+        "38"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)  16",
+          "Potential \u03a6(s)  38",
+          "Sweeps run4",
+          "Moves made4",
+          "StatusStable"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u2696\ufe0fThis assignment is stable against unilateral deviations \u2014 no student can improve their utility by moving alone.",
+          "\u2705Re-verified: the final assignment is a pure Nash equilibrium."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S7_equilibrium_worst_equilibrium_stable.png",
+      "tab": "Equilibrium",
+      "state": "worst equilibrium is stable although welfare 16 < 29",
+      "expected_on_screen": [
+        "stable against unilateral deviations"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)16",
+          "Potential \u03a6(s)38",
+          "Sweeps run4",
+          "Moves made4",
+          "StatusStable"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u2696\ufe0f  This assignment is stable against unilateral deviations \u2014 no student can improve their utility by moving alone.",
+          "\u2705Re-verified: the final assignment is a pure Nash equilibrium."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S8a_assignment_welfare_optimum_not_stable.png",
+      "tab": "Assignment",
+      "state": "welfare-maximising [0,0,1,0,1,1,2,2]: welfare 29, potential 47",
+      "expected_on_screen": [
+        "29",
+        "47"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)  29",
+          "Potential \u03a6(s)  47",
+          "Sweeps run4",
+          "Moves made4",
+          "StatusStable"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0fThis assignment is not stable \u2014 1 student(s) have a profitable unilateral move.",
+          "\u2705Re-verified: the final assignment is a pure Nash equilibrium."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S8b_equilibrium_welfare_optimum_not_stable.png",
+      "tab": "Equilibrium",
+      "state": "that optimum is NOT stable: Eli gains 2 by moving",
+      "expected_on_screen": [
+        "not stable",
+        "1 student(s)"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)29",
+          "Potential \u03a6(s)47",
+          "Sweeps run4",
+          "Moves made4",
+          "StatusStable"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0f  This assignment is not stable \u2014 1 student(s) have a profitable unilateral move.",
+          "\u2705Re-verified: the final assignment is a pure Nash equilibrium."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S9_assignment_random_seed1.png",
+      "tab": "Assignment",
+      "state": "Random button, seed 1 -> [0,2,0,1,0,1,1,1]",
+      "expected_on_screen": [],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)2",
+          "Social welfare W(s)  -26",
+          "Potential \u03a6(s)  21"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0fThis assignment is not stable \u2014 5 student(s) have a profitable unilateral move.",
+          "\u2139\ufe0fRun dynamics to see how this assignment evolves."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "file": "S10_simulation_tiny_example.png",
+      "tab": "Simulation",
+      "state": "Tiny example from [0,0]: one move to [0,1]",
+      "expected_on_screen": [
+        "Moves made 1",
+        "Status Stable"
+      ],
+      "observed": {
+        "metrics": [
+          "Crowding parameter (gamma)1",
+          "Social welfare W(s)8",
+          "Potential \u03a6(s)7",
+          "Sweeps run  2",
+          "Moves made  1",
+          "Status  Stable"
+        ],
+        "alerts": [
+          "\u2705  Real engine detected: game_engine.py and sample_data.py loaded.",
+          "\u26a0\ufe0fThis assignment is not stable \u2014 1 student(s) have a profitable unilateral move.",
+          "\u2705  Re-verified: the final assignment is a pure Nash equilibrium."
+        ]
+      },
+      "all_expected_values_found": true,
+      "problems": []
+    },
+    {
+      "final_checks": {
+        "console_errors": [],
+        "streamlit_exception_text_present": false
+      }
+    }
+  ]
+}
