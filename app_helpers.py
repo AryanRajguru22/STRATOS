@@ -631,7 +631,8 @@ def _base_layout(fig: go.Figure, title: str) -> go.Figure:
         paper_bgcolor="#fcfcfb",
         font=dict(color="#0b0b0b", family="system-ui, -apple-system, 'Segoe UI', sans-serif"),
         margin=dict(l=40, r=20, t=50, b=40),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0, font=dict(color="#0b0b0b")),
+        hoverlabel=dict(bgcolor="#fcfcfb", font=dict(color="#0b0b0b"), bordercolor=GRID_LINE),
     )
     fig.update_xaxes(gridcolor=GRID_LINE, zerolinecolor=GRID_LINE)
     fig.update_yaxes(gridcolor=GRID_LINE, zerolinecolor=GRID_LINE)
