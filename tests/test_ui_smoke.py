@@ -39,10 +39,14 @@ def test_s01_app_starts_without_exceptions():
     assert not at.exception
 
 
-def test_s01_app_renders_four_tabs():
+def test_s01_app_renders_all_tabs():
+    """Stronger replacement for the old 'four tabs' check: the four original tabs plus Analysis and Guide, by label."""
     at = AppTest.from_file(APP_PATH)
-    at.run(timeout=30)
-    assert len(at.tabs) == 4
+    at.run(timeout=60)
+    labels = [t.label for t in at.tabs]
+    assert len(labels) == 6
+    for expected in ("Scenario", "Assignment", "Equilibrium", "Simulation", "Analysis", "Guide"):
+        assert any(expected in label for label in labels), (expected, labels)
 
 
 def test_s02_default_run_has_no_exception():

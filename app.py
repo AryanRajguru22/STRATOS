@@ -1,332 +1,178 @@
 """
-STRATOS — Strategic Behavior in University Course / Project Team Formation.
+STRATOS -- Strategic Behavior in University Course / Project Team Formation.
 
-Streamlit frontend entry point. Owned by Harsh (frontend only).
+Streamlit entry point: sidebar (scenario, dynamics settings), session state, and the tabs. Tab content lives in
+`app_views.py` (Scenario, Assignment, Equilibrium, Simulation, Guide) and `app_analysis.py` (Analysis); chart and table
+builders, engine loading and the clearly-labelled mock fallback live in `app_helpers.py`.
 
-This file wires up layout, navigation, and session state against the
-team's frozen interface contract (`docs/TEAM_WORK_ALLOCATION.md`,
-Section 8): a `scenario` dict (students/projects/pref/w/gamma/skills)
-and a `profile` (one project index per student), evaluated through
-`game_engine` functions (`is_nash`, `best_response_dynamics`, ...).
-
-All data generation, mock-engine fallback, and chart-building logic
-lives in `app_helpers.py` so this file stays a thin UI layer. When
-`game_engine.py` / `sample_data.py` are not available, `app_helpers`
-transparently swaps in a contract-mirroring mock -- this file never
-has to know which one is active.
-
-Aryan's `game_engine.py` / `sample_data.py` and Ayush's report/PPT files
-are out of scope here and are never created or modified by this file.
+All game logic comes from `game_engine.py` / `sample_data.py` (set STRATOS_REQUIRE_REAL_ENGINE=1 to make any fallback a hard
+failure). All student data is synthetic.
 """
+import hashlib
+import json
+from types import SimpleNamespace
 
 import streamlit as st
 
+import app_analysis
 import app_helpers as helpers
+import app_views as views
 
-st.set_page_config(
-    page_title="STRATOS — Team Formation Game Theory",
-    page_icon="\U0001f3b2",
-    layout="wide",
-)
-
+st.set_page_config(page_title="STRATOS — Team Formation Game Theory", page_icon="\U0001f3b2", layout="wide")
 helpers.apply_custom_styles()
 
 bundle = helpers.load_engine_bundle()
 engine = bundle.engine
 sample_data = bundle.sample_data
 
+try:  # scenario import/export needs the real engine's validators
+    import scenario_io
+except Exception:  # pragma: no cover - only when the engine is missing or broken
+    scenario_io = None
 
-def build_scenario(preset: str) -> dict:
-    if preset == "Tiny hand-verified example":
-        return sample_data.get_tiny_scenario()
-    if preset == "Default scenario":
-        return sample_data.get_default_scenario()
-    return helpers.generate_custom_mock_scenario(
-        num_students=st.session_state.custom_num_students,
-        num_projects=st.session_state.custom_num_projects,
-        gamma=st.session_state.custom_gamma,
-        seed=st.session_state.custom_seed,
-    )
+PRESET_TINY = "Tiny hand-verified example"
+PRESET_DEFAULT = "Default scenario"
+PRESET_CUSTOM = "Custom synthetic scenario"
+PRESET_IMPORT = "Imported JSON scenario"
+MAX_STUDENTS, MAX_PROJECTS = 12, 5
 
 
 def set_profile(new_profile: list) -> None:
-    """Overwrites the profile programmatically (Reset/Random/regenerate).
-    Bumps profile_version so the per-student selectboxes below -- keyed on
-    it -- pick up the new values instead of keeping their own prior state."""
-    st.session_state.profile = new_profile
+    """Overwrite the assignment programmatically (Reset / Random / load / apply). Bumps profile_version so the per-student
+    selectboxes (keyed on it) pick up the new values, and drops any simulation result tied to the old assignment."""
+    st.session_state.profile = list(new_profile)
     st.session_state.profile_version = st.session_state.get("profile_version", 0) + 1
     st.session_state.pop("last_dynamics_result", None)
+    st.session_state.pop("last_dynamics_meta", None)
 
 
-def reset_profile_for_scenario(scenario: dict) -> None:
-    set_profile([0] * len(scenario["students"]))
+def build_scenario(preset: str):
+    """Return (scenario, label, kind, synthetic_note, error). Never returns an invalid scenario."""
+    note = None
+    if preset == PRESET_TINY:
+        sc, label, kind = sample_data.get_tiny_scenario(), "Tiny hand-verified example (2 students, 2 projects)", "tiny"
+    elif preset == PRESET_DEFAULT:
+        sc, label, kind = sample_data.get_default_scenario(), "Default scenario (8 students, 3 projects)", "default"
+    elif preset == PRESET_IMPORT:
+        up = st.session_state.get("import_file")
+        if up is None or scenario_io is None:
+            return sample_data.get_tiny_scenario(), "Tiny example (no file imported yet)", "tiny", None, \
+                "Upload a STRATOS scenario JSON file in the sidebar; showing the tiny example meanwhile."
+        try:
+            sc = scenario_io.scenario_from_json(up.getvalue(), MAX_STUDENTS, MAX_PROJECTS)
+        except engine.StratosError as exc:
+            return sample_data.get_tiny_scenario(), "Tiny example (import rejected)", "tiny", None, f"Import rejected: {exc}"
+        label, kind = f"Imported scenario “{up.name}”", "imported"
+        note = "Imported from a JSON file you supplied: synthetic experimental data, never real student records."
+    else:
+        sc = helpers.generate_custom_mock_scenario(
+            num_students=st.session_state.custom_num_students, num_projects=st.session_state.custom_num_projects,
+            gamma=st.session_state.custom_gamma, seed=st.session_state.custom_seed)
+        label, kind = "Custom synthetic scenario", "custom"
+        note = ("Randomly generated for experimentation from the seed in the sidebar: **not real student data** and not "
+                "the default demonstration dataset.")
+    if kind != "custom" and st.session_state.get("gamma_override_on"):
+        sc = dict(sc, gamma=st.session_state.gamma_override)
+        label += f", γ overridden to {sc['gamma']:g}"
+        note = (note + " " if note else "") + "The crowding parameter γ was overridden from the preset value."
+    elif kind in ("tiny", "default"):
+        note = None
+    try:
+        engine.validate_scenario(sc)
+    except engine.StratosError as exc:
+        return sample_data.get_tiny_scenario(), "Tiny example (invalid scenario rejected)", "tiny", None, f"Invalid scenario: {exc}"
+    return sc, label, kind, note, None
 
 
+# ------------------------------------------------------------------------------------------------ sidebar
 with st.sidebar:
     st.header("Scenario")
-    preset_options = ["Tiny hand-verified example", "Custom mock scenario"]
+    preset_options = [PRESET_TINY, PRESET_CUSTOM, PRESET_IMPORT]
     if not bundle.using_mock:
-        preset_options.insert(1, "Default scenario")
+        preset_options.insert(1, PRESET_DEFAULT)
     preset = st.selectbox("Scenario preset", preset_options, key="scenario_preset")
 
-    if preset == "Custom mock scenario":
-        st.caption("Adjustable, clearly-mocked scenario for exploring the UI at other sizes.")
-        st.slider("Number of students", 4, 12, value=8, key="custom_num_students")
-        st.slider("Number of projects", 2, 5, value=3, key="custom_num_projects")
+    if preset == PRESET_CUSTOM:
+        st.caption("Random synthetic scenario for experimentation (not real student data).")
+        st.slider("Number of students", 4, MAX_STUDENTS, value=8, key="custom_num_students")
+        st.slider("Number of projects", 2, MAX_PROJECTS, value=3, key="custom_num_projects")
         st.slider("Crowding parameter (gamma)", 0.0, 5.0, value=1.0, step=0.5, key="custom_gamma")
         st.number_input("Random seed", min_value=0, max_value=9999, value=42, key="custom_seed")
+    elif preset == PRESET_IMPORT:
+        st.file_uploader("Scenario JSON", type=["json"], key="import_file",
+                         help="A file exported from this app, or one following the format in docs/INTERFACE.md.")
+    if preset != PRESET_CUSTOM:
+        if st.checkbox("Override the crowding parameter γ (experiment)", key="gamma_override_on"):
+            st.slider("γ", 0.0, 5.0, value=2.0, step=0.5, key="gamma_override")
 
-    regenerate_clicked = st.button("\U0001f504 Regenerate scenario", width="stretch")
-    need_init = "scenario" not in st.session_state or st.session_state.get("active_preset") != preset
-    if regenerate_clicked or need_init:
-        st.session_state.scenario = build_scenario(preset)
+    regenerate_clicked = st.button("\U0001f504 Regenerate scenario", width="stretch",
+                                   help="Rebuild the scenario from the settings above and reset the assignment.")
+
+    # Rebuild whenever anything that defines the scenario changes -- never serve a stale scenario.
+    up = st.session_state.get("import_file")
+    signature = json.dumps({
+        "preset": preset,
+        "gamma": [st.session_state.get("gamma_override_on"), st.session_state.get("gamma_override")] if preset != PRESET_CUSTOM else None,
+        "custom": [st.session_state.get(k) for k in ("custom_num_students", "custom_num_projects", "custom_gamma", "custom_seed")] if preset == PRESET_CUSTOM else None,
+        "file": hashlib.sha256(up.getvalue()).hexdigest() if (preset == PRESET_IMPORT and up is not None) else None,
+    }, sort_keys=True)
+    if regenerate_clicked or "scenario" not in st.session_state or st.session_state.get("scenario_signature") != signature:
+        sc_new, label_new, kind_new, note_new, err_new = build_scenario(preset)
+        st.session_state.scenario = sc_new
+        st.session_state.scenario_label = label_new
+        st.session_state.scenario_kind = kind_new
+        st.session_state.synthetic_note = note_new
+        st.session_state.scenario_error = err_new
+        st.session_state.scenario_signature = signature
         st.session_state.active_preset = preset
-        reset_profile_for_scenario(st.session_state.scenario)
+        st.session_state.scenario_version = st.session_state.get("scenario_version", 0) + 1
+        set_profile([0] * len(sc_new["students"]))
+
+    if st.session_state.get("scenario_error"):
+        st.error(st.session_state.scenario_error)
+    if scenario_io is not None:
+        try:
+            st.download_button("⬇ Export scenario (JSON)", data=scenario_io.scenario_to_json(st.session_state.scenario),
+                               file_name="stratos_scenario.json", mime="application/json", width="stretch")
+        except engine.StratosError as exc:  # pragma: no cover - the active scenario is validated on build
+            st.error(f"Cannot export: {exc}")
 
     st.divider()
     st.caption("Best-response dynamics (used in the Simulation tab)")
     order_choice = st.radio("Student order each sweep", ["round_robin", "random"], key="order_choice")
-    dynamics_seed = st.number_input("Dynamics seed", min_value=0, max_value=9999, value=7, key="dynamics_seed")
+    dynamics_seed = st.number_input("Dynamics seed", min_value=0, max_value=9999, value=7, key="dynamics_seed",
+                                    help="Only affects the random order; round_robin is deterministic.")
     max_rounds = st.slider("Max sweeps", 5, 200, value=50, key="max_rounds")
 
 scenario = st.session_state.scenario
-n_students = len(scenario["students"])
-n_projects = len(scenario["projects"])
-
-helpers.render_app_header(bundle)
-
-tab_scenario, tab_assignment, tab_equilibrium, tab_simulation = st.tabs(
-    ["\U0001f4cb Scenario", "\U0001f91d Assignment", "⚖️ Equilibrium", "\U0001f500 Simulation"]
+ctx = SimpleNamespace(
+    bundle=bundle, engine=engine, scenario=scenario, n=len(scenario["students"]), m=len(scenario["projects"]),
+    scenario_label=st.session_state.scenario_label, scenario_kind=st.session_state.scenario_kind,
+    synthetic_note=st.session_state.synthetic_note, order=order_choice, dynamics_seed=dynamics_seed,
+    max_rounds=max_rounds, set_profile=set_profile,
 )
 
-# ---------------------------------------------------------------------------
-# Tab 1: Scenario
-# ---------------------------------------------------------------------------
-with tab_scenario:
-    st.subheader("Players, resources, and parameters")
-    st.markdown(
-        "**Students are players.** Each picks exactly one **project**. Utility combines "
-        "(1) the student's own preference for that project, (2) teammate **compatibility** "
-        "with everyone else on the same project, and (3) a **crowding cost** that grows with "
-        "team size. Preferences and compatibility are shown below; try switching presets or "
-        "the crowding parameter `gamma` to see how the scenario changes."
-    )
-    if bundle.using_mock:
-        helpers.render_mock_badge("Mock scenario data -- mirrors the contract shape, not Aryan's real dataset")
+helpers.render_app_header(bundle, active_label=st.session_state.scenario_label)
 
-    col_students, col_projects = st.columns(2)
-    with col_students:
-        st.markdown("**Students**")
-        st.dataframe(helpers.students_df(scenario), width="stretch", hide_index=True)
-    with col_projects:
-        st.markdown("**Projects**")
-        st.dataframe(helpers.projects_df(scenario), width="stretch", hide_index=True)
-        st.metric("Crowding parameter (gamma)", scenario["gamma"])
-
-    st.markdown("**Preferences** -- higher is more preferred (0–10 scale).")
-    st.plotly_chart(helpers.preference_heatmap(scenario), width="stretch")
-
-    st.markdown("**Teammate compatibility** -- symmetric, zero on the diagonal.")
-    st.plotly_chart(helpers.compatibility_heatmap(scenario), width="stretch")
-    with st.expander("How to read these charts"):
-        st.markdown(
-            "The preference heatmap shows each student's reported value for each project. "
-            "The compatibility heatmap shows `w[i][j]`: blue means two students work well "
-            "together if placed on the same team, red means friction; it never affects "
-            "students on different teams."
-        )
-
-# ---------------------------------------------------------------------------
-# Tab 2: Assignment
-# ---------------------------------------------------------------------------
-with tab_assignment:
-    st.subheader("Build an assignment")
-    st.markdown(
-        "Choose a project for every student to build a **profile** `s = (s_0, ..., s_{n-1})`. "
-        "Every profile built here is valid by construction -- each selector only offers real "
-        "projects -- so it always passes `validate_profile`."
-    )
-    if bundle.using_mock:
-        helpers.render_mock_badge()
-
-    control_cols = st.columns([1, 1, 1, 2])
-    with control_cols[0]:
-        assignment_seed = st.number_input("Seed", min_value=0, max_value=9999, value=1, key="assignment_seed", label_visibility="collapsed")
-    with control_cols[1]:
-        if st.button("\U0001f3b2 Random", width="stretch"):
-            set_profile(engine.random_profile(scenario, seed=assignment_seed))
-    with control_cols[2]:
-        if st.button("↺ Reset", width="stretch"):
-            set_profile([0] * n_students)
-
-    profile = st.session_state.profile
-    profile_version = st.session_state.get("profile_version", 0)
-    st.markdown("**Per-student assignment**")
-    assignment_cols = st.columns(min(4, n_students))
-    new_profile = list(profile)
-    for i, name in enumerate(scenario["students"]):
-        with assignment_cols[i % len(assignment_cols)]:
-            choice = st.selectbox(
-                name,
-                options=list(range(n_projects)),
-                format_func=lambda t: scenario["projects"][t],
-                index=profile[i],
-                key=f"assign_{i}_{st.session_state.active_preset}_{profile_version}",
-            )
-            new_profile[i] = choice
-    st.session_state.profile = new_profile
-    profile = new_profile
-
-    try:
-        engine.validate_profile(profile, scenario)
-    except engine.StratosError as exc:
-        st.error(str(exc))
-        st.stop()
-
-    st.divider()
-    st.subheader("Evaluation panel")
-    teams = engine.teams(profile, scenario)
-    utilities = engine.utilities(profile, scenario)
-    welfare = engine.social_welfare(profile, scenario)
-    potential = engine.potential(profile, scenario)
-
-    metric_cols = st.columns(2)
-    metric_cols[0].metric("Social welfare W(s)", round(welfare, 2))
-    metric_cols[1].metric("Potential Φ(s)", round(potential, 2))
-
-    eval_cols = st.columns(2)
-    with eval_cols[0]:
-        st.markdown("**Teams by project**")
-        st.dataframe(helpers.teams_df(teams, scenario), width="stretch", hide_index=True)
-    with eval_cols[1]:
-        st.markdown("**Utility per student**")
-        st.dataframe(helpers.utilities_df(profile, scenario, utilities), width="stretch", hide_index=True)
-
-    st.plotly_chart(helpers.utility_bar_chart(profile, scenario, utilities), width="stretch")
-
-# ---------------------------------------------------------------------------
-# Tab 3: Equilibrium
-# ---------------------------------------------------------------------------
-with tab_equilibrium:
-    st.subheader("Is this assignment stable?")
-    st.markdown(
-        "An assignment is a **pure Nash equilibrium** if no student can gain by unilaterally "
-        "switching to a different project while everyone else stays put. Stable is **not** the "
-        "same as optimal -- it only means nobody wants to move alone."
-    )
-    if bundle.using_mock:
-        helpers.render_mock_badge()
-
-    profile = st.session_state.profile
-    try:
-        result = engine.is_nash(profile, scenario)
-    except engine.StratosError as exc:
-        st.error(str(exc))
-        st.stop()
-
-    if result["is_nash"]:
-        st.success(
-            "This assignment is **stable against unilateral deviations** -- no student can "
-            "improve their utility by moving alone.",
-            icon="⚖️",
-        )
-    else:
-        n_dev = helpers.count_students_with_deviations(result["deviations"])
-        st.warning(
-            f"This assignment is **not stable** -- {n_dev} student(s) have a profitable "
-            "unilateral move.",
-            icon="⚠️",
-        )
-        top = result["deviations"][0]
-        st.markdown(
-            f"For example, **{scenario['students'][top['student']]}** would gain "
-            f"**{top['gain']:.2f}** utility by moving from *{scenario['projects'][top['from_project']]}* "
-            f"to *{scenario['projects'][top['to_project']]}*."
-        )
-        st.markdown("**All profitable deviations**")
-        st.dataframe(helpers.deviations_df(result["deviations"], scenario), width="stretch", hide_index=True)
-
-    with st.expander("What does 'stable' mean here?"):
-        st.markdown(
-            "This checks every student against every alternative project, one student at a "
-            "time (a unilateral deviation), using the same potential-game model as the "
-            "Assignment tab. It never claims the assignment is welfare-optimal or "
-            "Pareto-optimal -- only that it resists single-student deviations."
-        )
-
-# ---------------------------------------------------------------------------
-# Tab 4: Simulation
-# ---------------------------------------------------------------------------
-with tab_simulation:
-    st.subheader("Best-response dynamics")
-    st.markdown(
-        "Starting from the assignment on the **Assignment** tab, students take turns switching "
-        "to their best project, one sweep at a time, until nobody wants to move (or the sweep "
-        "limit is reached)."
-    )
-    if bundle.using_mock:
-        helpers.render_mock_badge()
-
-    start_profile = st.session_state.profile
-    if st.button("▶️ Run dynamics", type="primary"):
-        try:
-            st.session_state.last_dynamics_result = engine.best_response_dynamics(
-                scenario, start_profile, order=order_choice, seed=dynamics_seed, max_rounds=max_rounds
-            )
-        except engine.StratosError as exc:
-            st.error(str(exc))
-            st.stop()
-
-    if "last_dynamics_result" not in st.session_state:
-        st.info("Run dynamics to see how this assignment evolves.", icon="ℹ️")
-    else:
-        result = st.session_state.last_dynamics_result
-        final_profile = result["final_profile"]
-
-        # Re-verify the final state with a fresh is_nash call -- never trust
-        # the dynamics' own 'converged'/'is_nash_final' flag on its own.
-        try:
-            final_check = engine.is_nash(final_profile, scenario)
-        except engine.StratosError as exc:
-            st.error(str(exc))
-            st.stop()
-
-        metric_cols = st.columns(3)
-        metric_cols[0].metric("Sweeps run", result["rounds"])
-        metric_cols[1].metric("Moves made", len(result["steps"]))
-        if not result["converged"]:
-            metric_cols[2].metric("Status", "Not converged")
-            st.warning(f"Hit the sweep limit ({max_rounds}) before no student wanted to move.", icon="⚠️")
-        elif final_check["is_nash"]:
-            metric_cols[2].metric("Status", "Stable")
-            st.success("Re-verified: the final assignment is a pure Nash equilibrium.", icon="✅")
-        else:
-            metric_cols[2].metric("Status", "Unstable")
-            st.error(
-                "The dynamics reported convergence, but a fresh `is_nash` check found "
-                "profitable deviations -- do not trust 'converged' alone.",
-                icon="❌",
-            )
-
-        st.markdown("**Move-by-move trace**")
-        st.dataframe(helpers.dynamics_steps_df(result["steps"], scenario), width="stretch", hide_index=True)
-
-        if result["steps"]:
-            step_idx = st.slider("Inspect profile after move #", 0, len(result["steps"]), value=len(result["steps"]))
-            step_profile = helpers.profile_at_step(result["start_profile"], result["steps"], step_idx)
-            st.markdown(f"**Teams after {step_idx} move(s)**")
-            st.dataframe(
-                helpers.teams_df(engine.teams(step_profile, scenario), scenario),
-                width="stretch",
-                hide_index=True,
-            )
-
-        trace_df = helpers.replay_welfare_potential_trace(engine, scenario, result["start_profile"], result["steps"])
-        st.plotly_chart(helpers.dynamics_trace_chart(trace_df), width="stretch")
+tabs = st.tabs(["\U0001f4cb Scenario", "\U0001f91d Assignment", "⚖️ Equilibrium", "\U0001f500 Simulation",
+                "\U0001f4ca Analysis", "\U0001f4d6 Guide"])
+with tabs[0]:
+    views.render_scenario_tab(ctx)
+with tabs[1]:
+    views.render_assignment_tab(ctx)
+with tabs[2]:
+    views.render_equilibrium_tab(ctx)
+with tabs[3]:
+    views.render_simulation_tab(ctx)
+with tabs[4]:
+    app_analysis.render_analysis_tab(bundle, engine, scenario, st.session_state.profile, set_profile)
+with tabs[5]:
+    views.render_guide_tab(ctx)
 
 st.divider()
 st.caption(
-    "STRATOS frontend — built with Streamlit. "
-    + ("Using the real game_engine / sample_data." if not bundle.using_mock else "Running on a contract-mirroring mock pending game_engine.py / sample_data.py.")
-    + " Report & presentation materials are maintained separately."
+    "STRATOS — Streamlit front end. "
+    + ("Using the real game_engine / sample_data." if not bundle.using_mock
+       else "RUNNING ON A MOCK that mirrors the interface contract; these results are not from the verified engine.")
+    + " All data is synthetic."
 )
