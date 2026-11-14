@@ -425,6 +425,54 @@ def pure_nash_equilibria(strategy_counts: Sequence[int], payoff_fn: Callable[[tu
     return found
 
 
+class _Scan:
+    """Every profile of a scenario evaluated once: utilities, welfare, potential and the equilibrium indices."""
+
+    __slots__ = ("M", "profiles", "utils", "welfare", "pot", "eq_idx", "_by_welfare")
+
+    def __init__(self, M: _Model, max_profiles: int):
+        total = M.m ** M.n
+        if total > max_profiles:
+            raise StratosError(f"{M.m}^{M.n} = {total} profiles exceeds the enumeration limit of {max_profiles}")
+        self.M = M
+        self.profiles = list(itertools.product(range(M.m), repeat=M.n))
+        self.utils = [_utilities(M, p) for p in self.profiles]
+        self.welfare = [sum(u) for u in self.utils]
+        self.pot = [_potential(M, p) for p in self.profiles]
+        self.eq_idx = [k for k, p in enumerate(self.profiles) if not _has_deviation(M, p, self.utils[k])]
+        self._by_welfare = None
+
+    def dominator(self, k: int):
+        """Index of some profile that Pareto-dominates profile k (everyone at least as well off, someone strictly
+        better off, up to EPS), or None if k is Pareto-optimal among ALL profiles.
+
+        A dominator q has u_q[i] >= u_k[i] - EPS for every i, so W_q >= W_k - n*EPS. Scanning profiles in
+        descending welfare order and stopping at that bound examines only profiles that could possibly dominate,
+        which gives exactly the same answer as comparing against every profile, but much faster.
+        """
+        if self._by_welfare is None:
+            self._by_welfare = sorted(range(len(self.profiles)), key=lambda q: -self.welfare[q])
+        n = self.M.n
+        u = self.utils[k]
+        floor = self.welfare[k] - (n + 1) * EPS
+        for q in self._by_welfare:
+            if self.welfare[q] < floor:
+                return None
+            if q == k:
+                continue
+            v = self.utils[q]
+            if all(v[i] >= u[i] - EPS for i in range(n)) and any(v[i] > u[i] + EPS for i in range(n)):
+                return q
+        return None
+
+
+def _efficiency_ratios(w_max, eq_w):
+    """(price_of_anarchy, price_of_stability); None unless the optimum and every equilibrium welfare are > 0."""
+    if eq_w and min(eq_w) > EPS and w_max > EPS:
+        return w_max / min(eq_w), w_max / max(eq_w)
+    return None, None
+
+
 def enumerate_equilibria(scenario: Any, with_analysis: bool = True,
                          max_profiles: int = MAX_ENUMERATION_PROFILES) -> dict:
     """Exhaustively enumerate all m**n profiles.
@@ -434,15 +482,8 @@ def enumerate_equilibria(scenario: Any, with_analysis: bool = True,
     With with_analysis=False the Pareto flags and both ratios are null; everything else is still computed.
     Also reports the potential maximisers and whether each really passes the equilibrium check.
     """
-    M = _compile(scenario)
-    total = M.m ** M.n
-    if total > max_profiles:
-        raise StratosError(f"{M.m}^{M.n} = {total} profiles exceeds the enumeration limit of {max_profiles}")
-    profiles = list(itertools.product(range(M.m), repeat=M.n))
-    utils_all = [_utilities(M, p) for p in profiles]
-    welfare_all = [sum(u) for u in utils_all]
-    pot_all = [_potential(M, p) for p in profiles]
-    eq_idx = [k for k, p in enumerate(profiles) if not _has_deviation(M, p, utils_all[k])]
+    scan = _Scan(_compile(scenario), max_profiles)
+    profiles, utils_all, welfare_all, pot_all, eq_idx = scan.profiles, scan.utils, scan.welfare, scan.pot, scan.eq_idx
     eq_lookup = set(eq_idx)
 
     w_max = max(welfare_all)
@@ -450,26 +491,18 @@ def enumerate_equilibria(scenario: Any, with_analysis: bool = True,
     phi_max = max(pot_all)
     phi_idx = [k for k, v in enumerate(pot_all) if v >= phi_max - EPS]
 
-    def pareto_optimal(k: int) -> bool:
-        u = utils_all[k]
-        for q, v in enumerate(utils_all):
-            if q != k and all(v[i] >= u[i] - EPS for i in range(M.n)) and any(v[i] > u[i] + EPS for i in range(M.n)):
-                return False
-        return True
-
     equilibria = [{"profile": list(profiles[k]), "utilities": utils_all[k], "welfare": welfare_all[k],
-                   "potential": pot_all[k], "pareto_optimal": pareto_optimal(k) if with_analysis else None}
+                   "potential": pot_all[k], "pareto_optimal": (scan.dominator(k) is None) if with_analysis else None}
                   for k in eq_idx]
     eq_w = [welfare_all[k] for k in eq_idx]
     gap_best = gap_worst = poa = pos = None
     if eq_w:
         gap_best = w_max - max(eq_w)
         gap_worst = w_max - min(eq_w)
-        if with_analysis and min(eq_w) > EPS and w_max > EPS:
-            poa = w_max / min(eq_w)
-            pos = w_max / max(eq_w)
+        if with_analysis:
+            poa, pos = _efficiency_ratios(w_max, eq_w)
     return {
-        "n_profiles": total,
+        "n_profiles": len(profiles),
         "n_equilibria": len(equilibria),
         "equilibria": equilibria,
         "optimal": {"profile": list(profiles[opt_idx[0]]), "welfare": welfare_all[opt_idx[0]],
@@ -484,6 +517,124 @@ def enumerate_equilibria(scenario: Any, with_analysis: bool = True,
             "profiles": [list(profiles[k]) for k in phi_idx],
             "all_are_equilibria": all(k in eq_lookup for k in phi_idx),
         },
+    }
+
+
+def utility_breakdown(i: int, profile: Sequence[int], scenario: Any) -> dict:
+    """Split u_i(s) into its three terms: preference + compatibility - crowding.
+
+    'total' is computed as preference + compatibility - crowding from the parts below, and equals utility(i, ...)
+    exactly (a test asserts this on every default-scenario profile). 'teammates' lists each teammate and w[i][j].
+    """
+    M = _compile(scenario)
+    s = _profile(profile, M)
+    i = _student(i, M)
+    t = s[i]
+    mates = [j for j in range(M.n) if j != i and s[j] == t]
+    compat = sum(M.w[i][j] for j in mates)
+    crowd = M.crowd[len(mates) + 1]
+    return {"student": i, "project": t, "team_size": len(mates) + 1, "preference": M.pref[i][t],
+            "compatibility": compat, "crowding": crowd, "total": M.pref[i][t] + compat - crowd,
+            "teammates": [{"student": j, "weight": M.w[i][j]} for j in mates]}
+
+
+def analyze_landscape(scenario: Any, max_profiles: int = MAX_ENUMERATION_PROFILES) -> dict:
+    """Full strategic analysis of a scenario by exhaustive enumeration (raises StratosError above the cap).
+
+    Everything is computed from one pass over all m**n profiles, so the numbers are mutually consistent. Keys:
+
+    n_profiles, n_equilibria, equilibrium_share      counts and the fraction of profiles that are equilibria
+    equilibria               every pure Nash equilibrium: profile, utilities, welfare, potential, pareto_optimal,
+                             dominated_by (a profile that Pareto-dominates it, or None) and dominated_by_utilities
+    equilibrium_welfare_levels   [{welfare, count}] ascending; n_equilibrium_welfare_levels
+    best_equilibrium / worst_equilibrium   {profile, welfare} (lexicographically first among ties), None if no NE
+    optimal, optimal_profiles, optimal_is_equilibrium    welfare maximiser(s) and whether each is an equilibrium
+    welfare_gap_best_equilibrium / welfare_gap_worst_equilibrium   W_opt - W(NE)
+    price_of_stability, price_of_anarchy, ratio_status, ratio_note
+                             ratios are None unless W_opt and every equilibrium welfare are strictly positive;
+                             ratio_status is "defined" or "undefined" and ratio_note says why
+    n_pareto_optimal_equilibria, n_pareto_dominated_equilibria
+    potential_maximizers     as in enumerate_equilibria
+    welfare_distribution     [{welfare, n_profiles, n_equilibria}] over ALL profiles, ascending welfare
+    welfare_potential_points [{welfare, potential, is_equilibrium, count}] aggregated scatter data
+    """
+    scan = _Scan(_compile(scenario), max_profiles)
+    profiles, utils_all, welfare_all, pot_all = scan.profiles, scan.utils, scan.welfare, scan.pot
+    eq_idx = scan.eq_idx
+    eq_set = set(eq_idx)
+    total = len(profiles)
+
+    w_max = max(welfare_all)
+    opt_idx = [k for k, v in enumerate(welfare_all) if v >= w_max - EPS]
+    phi_max = max(pot_all)
+    phi_idx = [k for k, v in enumerate(pot_all) if v >= phi_max - EPS]
+
+    equilibria = []
+    for k in eq_idx:
+        d = scan.dominator(k)
+        equilibria.append({"profile": list(profiles[k]), "utilities": utils_all[k], "welfare": welfare_all[k],
+                           "potential": pot_all[k], "pareto_optimal": d is None,
+                           "dominated_by": None if d is None else list(profiles[d]),
+                           "dominated_by_utilities": None if d is None else utils_all[d]})
+    eq_w = [welfare_all[k] for k in eq_idx]
+    poa, pos = _efficiency_ratios(w_max, eq_w)
+    if not eq_w:
+        status, note = "undefined", "no pure Nash equilibrium exists in this scenario"
+    elif poa is None:
+        status = "undefined"
+        note = ("price of anarchy / stability need the optimum and every equilibrium welfare to be strictly "
+                "positive; here the optimum is %s and the lowest equilibrium welfare is %s. The welfare gaps "
+                "are still meaningful." % (w_max, min(eq_w)))
+    else:
+        status, note = "defined", "optimum and every equilibrium welfare are strictly positive"
+
+    best = worst = None
+    if eq_idx:
+        kb = max(eq_idx, key=lambda k: (welfare_all[k], -k))
+        kw = min(eq_idx, key=lambda k: (welfare_all[k], k))
+        best = {"profile": list(profiles[kb]), "welfare": welfare_all[kb]}
+        worst = {"profile": list(profiles[kw]), "welfare": welfare_all[kw]}
+
+    eq_levels: dict = {}
+    for w_ in eq_w:
+        eq_levels[w_] = eq_levels.get(w_, 0) + 1
+    dist: dict = {}
+    points: dict = {}
+    for k in range(total):
+        row = dist.setdefault(welfare_all[k], [0, 0])
+        row[0] += 1
+        if k in eq_set:
+            row[1] += 1
+        key = (welfare_all[k], pot_all[k], k in eq_set)
+        points[key] = points.get(key, 0) + 1
+    n_dom = sum(1 for e in equilibria if not e["pareto_optimal"])
+    return {
+        "n_profiles": total,
+        "n_equilibria": len(eq_idx),
+        "equilibrium_share": len(eq_idx) / total,
+        "equilibria": equilibria,
+        "equilibrium_welfare_levels": [{"welfare": w_, "count": c} for w_, c in sorted(eq_levels.items())],
+        "n_equilibrium_welfare_levels": len(eq_levels),
+        "best_equilibrium": best,
+        "worst_equilibrium": worst,
+        "optimal": {"profile": list(profiles[opt_idx[0]]), "welfare": welfare_all[opt_idx[0]],
+                    "utilities": utils_all[opt_idx[0]]},
+        "optimal_profiles": [list(profiles[k]) for k in opt_idx],
+        "optimal_is_equilibrium": [k in eq_set for k in opt_idx],
+        "welfare_gap_best_equilibrium": (w_max - max(eq_w)) if eq_w else None,
+        "welfare_gap_worst_equilibrium": (w_max - min(eq_w)) if eq_w else None,
+        "price_of_stability": pos,
+        "price_of_anarchy": poa,
+        "ratio_status": status,
+        "ratio_note": note,
+        "n_pareto_optimal_equilibria": len(equilibria) - n_dom,
+        "n_pareto_dominated_equilibria": n_dom,
+        "potential_maximizers": {"potential": pot_all[phi_idx[0]], "profiles": [list(profiles[k]) for k in phi_idx],
+                                 "all_are_equilibria": all(k in eq_set for k in phi_idx)},
+        "welfare_distribution": [{"welfare": w_, "n_profiles": a, "n_equilibria": b}
+                                 for w_, (a, b) in sorted(dist.items())],
+        "welfare_potential_points": [{"welfare": w_, "potential": p_, "is_equilibrium": e_, "count": c}
+                                     for (w_, p_, e_), c in sorted(points.items())],
     }
 
 
