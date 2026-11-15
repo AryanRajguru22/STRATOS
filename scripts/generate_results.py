@@ -4,6 +4,7 @@
 
 Writes:
   docs/results/engine_report.json   output of  python game_engine.py --report --out ...  plus git provenance
+  docs/results/analysis_report.json  distributions, best-response basins (both orders) and sensitivity sweeps (default scenario)
   docs/results/pytest_output.txt    full output of  python -m pytest -q
   docs/results/timing.txt           enumeration timing read from the report (5 timed runs)
   docs/results/independent_crosscheck_output.txt   output of  python scripts/independent_crosscheck.py --compare
@@ -57,6 +58,28 @@ def main():
     with open(report_path, "w", encoding="utf-8", newline="\n") as f:
         json.dump(report, f, indent=2)
         f.write("\n")
+
+    # 1b. analysis report: the exhaustive analyses behind the Analysis tab, straight from the engine
+    sys.path.insert(0, ROOT)
+    import game_engine as ge
+    import sample_data as sd
+    sc = sd.get_default_scenario()
+    analysis = {
+        "note": "Default (synthetic) scenario; sensitivity variants are computed on independent copies.",
+        "meta": {"generated_at": now, "git": info},
+        "distributions": ge.analyze_distributions(sc),
+        "basins": {order: ge.analyze_basins(sc, order=order) for order in ge.VALID_ORDERS},
+        "sensitivity": {
+            "gamma": ge.sensitivity_sweep(sc, "gamma", [0.5 * k for k in range(11)]),
+            "compatibility_scale": ge.sensitivity_sweep(sc, "compatibility_scale", [0.25 * k for k in range(9)]),
+            "preference_scale": ge.sensitivity_sweep(sc, "preference_scale", [0.25 * k for k in range(9)]),
+        },
+    }
+    with open(os.path.join(OUT, "analysis_report.json"), "w", encoding="utf-8", newline="
+") as f:
+        json.dump(analysis, f, indent=1)
+        f.write("
+")
 
     # 2. tests
     tests = run(PY, "-m", "pytest", "-q", "-p", "no:cacheprovider")

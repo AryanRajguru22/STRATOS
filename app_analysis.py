@@ -31,6 +31,35 @@ def cached_landscape(key: str) -> dict:
     return game_engine.analyze_landscape(json.loads(key))
 
 
+@st.cache_data(show_spinner=False, max_entries=6)
+def cached_distributions(key: str) -> dict:
+    import game_engine
+
+    return game_engine.analyze_distributions(json.loads(key))
+
+
+@st.cache_data(show_spinner=False, max_entries=6)
+def cached_basins(key: str, order: str) -> dict:
+    import game_engine
+
+    return game_engine.analyze_basins(json.loads(key), order=order)
+
+
+@st.cache_data(show_spinner=False, max_entries=12)
+def cached_sweep(key: str, parameter: str, values: tuple) -> list:
+    """Sensitivity sweep on explicit copies of the scenario (the engine never touches the baseline)."""
+    import game_engine
+
+    return game_engine.sensitivity_sweep(json.loads(key), parameter, list(values))
+
+
+SWEEPS = {
+    "gamma": ("Crowding strength γ", [round(0.5 * k, 2) for k in range(0, 11)], "γ"),
+    "compatibility_scale": ("Compatibility scale (every w[i][j] × factor)", [round(0.25 * k, 2) for k in range(0, 9)], "factor"),
+    "preference_scale": ("Preference scale (every pref[i][t] × factor)", [round(0.25 * k, 2) for k in range(0, 9)], "factor"),
+}
+
+
 def enumeration_cap(engine) -> int:
     return getattr(engine, "MAX_ENUMERATION_PROFILES", 100_000)
 
@@ -115,6 +144,74 @@ def welfare_potential_chart(a: dict, current=None) -> go.Figure:
     fig.update_xaxes(title="Potential Φ(s)")
     fig.update_yaxes(title="Social welfare W(s)")
     return H._base_layout(fig, "Welfare vs potential: equilibria are not simply the high-welfare assignments", height=430)
+
+
+def largest_team_chart(d: dict) -> go.Figure:
+    rows = d["largest_team"]
+    fig = go.Figure()
+    fig.add_bar(x=[r["size"] for r in rows], y=[r["n_profiles"] for r in rows], name="All assignments", marker_color="#3b4b6e",
+                hovertemplate="largest team = %{x}<br>%{y} assignments<extra></extra>")
+    fig.add_bar(x=[r["size"] for r in rows], y=[r["n_equilibria"] or None for r in rows], name="Equilibria", marker_color=ACCENT,
+                hovertemplate="largest team = %{x}<br>%{y} equilibria<extra></extra>")
+    fig.update_layout(barmode="overlay")
+    fig.update_xaxes(title="Size of the largest team", dtick=1)
+    fig.update_yaxes(title="Number of assignments (log scale)", type="log")
+    return H._base_layout(fig, "Team sizes: all assignments vs equilibria", height=340)
+
+
+def utility_histogram_chart(d: dict) -> go.Figure:
+    rows = d["utility_histogram"]
+    fig = go.Figure()
+    fig.add_bar(x=[r["utility"] for r in rows], y=[r["n_student_profiles"] for r in rows], name="Every (assignment, student) pair",
+                marker_color="#3b4b6e", hovertemplate="utility %{x}<br>%{y} cases<extra></extra>")
+    fig.add_bar(x=[r["utility"] for r in rows], y=[r["n_in_equilibria"] or None for r in rows], name="Inside equilibria only",
+                marker_color=ACCENT, hovertemplate="utility %{x}<br>%{y} cases<extra></extra>")
+    fig.update_layout(barmode="overlay")
+    fig.update_xaxes(title="Individual utility u_i(s)")
+    fig.update_yaxes(title="Count (log scale)", type="log")
+    return H._base_layout(fig, "Individual utility distribution", height=340)
+
+
+def equilibrium_project_heatmap(d: dict, scenario: dict) -> go.Figure:
+    z = d["equilibrium_project_counts"]
+    fig = go.Figure(go.Heatmap(z=z, x=scenario["projects"], y=scenario["students"], colorscale="Blues", zmin=0,
+                               text=z, texttemplate="%{text}", colorbar=dict(title="# NE"),
+                               hovertemplate="%{y} on %{x} in %{z} equilibria<extra></extra>"))
+    fig.update_yaxes(autorange="reversed")
+    return H._base_layout(fig, "How many equilibria put each student on each project", height=380)
+
+
+def basin_chart(b: dict, scenario: dict, w_opt) -> go.Figure:
+    ends = b["endpoints"]
+    labels = [f"#{k + 1}: " + describe_profile(e["profile"], scenario) for k, e in enumerate(ends)]
+    colors = [STATUS["good"] if abs(e["welfare"] - w_opt) < H.EPS else ACCENT for e in ends]
+    fig = go.Figure(go.Bar(
+        y=list(range(len(ends))), x=[e["basin_size"] for e in ends], orientation="h", marker_color=colors,
+        customdata=[[labels[k], e["welfare"], 100 * e["share"]] for k, e in enumerate(ends)],
+        hovertemplate="%{customdata[0]}<br>welfare %{customdata[1]}<br>%{x} starts (%{customdata[2]:.1f}%)<extra></extra>"))
+    fig.update_yaxes(autorange="reversed", title="Final assignment (ranked by basin size)", dtick=1 if len(ends) <= 30 else None)
+    fig.update_xaxes(title="Number of starting assignments that end here")
+    return H._base_layout(fig, "Where best-response dynamics ends, from every starting assignment", height=max(320, 18 * len(ends) + 120))
+
+
+def sensitivity_charts(rows: list, label: str, baseline) -> tuple:
+    xs = [r["value"] for r in rows]
+    f1 = go.Figure(go.Scatter(x=xs, y=[r["n_equilibria"] for r in rows], mode="lines+markers", line=dict(color=ACCENT),
+                              hovertemplate=label + " = %{x}<br>%{y} pure equilibria<extra></extra>"))
+    f1.update_xaxes(title=label)
+    f1.update_yaxes(title="Pure Nash equilibria")
+    f2 = go.Figure()
+    f2.add_scatter(x=xs, y=[r["optimal_welfare"] for r in rows], mode="lines+markers", name="Maximum welfare", line=dict(color=STATUS["good"]))
+    f2.add_scatter(x=xs, y=[r["best_equilibrium_welfare"] for r in rows], mode="lines+markers", name="Best equilibrium", line=dict(color=ACCENT, dash="dot"))
+    f2.add_scatter(x=xs, y=[r["worst_equilibrium_welfare"] for r in rows], mode="lines+markers", name="Worst equilibrium", line=dict(color="#7aa2f7"))
+    f2.update_xaxes(title=label)
+    f2.update_yaxes(title="Social welfare W")
+    for f in (f1, f2):
+        if baseline is not None:
+            f.add_vline(x=baseline, line_dash="dash", line_color=STATUS["warning"], annotation_text="baseline",
+                        annotation_font_color=STATUS["warning"])
+    return (H._base_layout(f1, "Equilibrium count vs parameter", height=320),
+            H._base_layout(f2, "Welfare vs parameter", height=320))
 
 
 # ---------------------------------------------------------------------------------------------- tab
@@ -226,11 +323,11 @@ def render_analysis_tab(bundle, engine, scenario: dict, profile: list, set_profi
     st.markdown("### 3 · Price of stability and price of anarchy")
     defined = a["ratio_status"] == "defined"
     c = st.columns(2)
-    _ratio_metric(c[0], "Price of stability  W(s*) / max_NE W", a["price_of_stability"], defined,
+    _ratio_metric(c[0], "Price of stability  W_opt / max_NE W", a["price_of_stability"], defined,
                   "How much welfare is lost, at best, by insisting on stability. 1.0 means some optimum is stable.")
-    _ratio_metric(c[1], "Price of anarchy  W(s*) / min_NE W", a["price_of_anarchy"], defined,
+    _ratio_metric(c[1], "Price of anarchy  W_opt / min_NE W", a["price_of_anarchy"], defined,
                   "How bad the worst stable assignment is relative to the optimum.")
-    st.latex(r"\mathrm{PoS}=\frac{W(s^*)}{\max_{s\in NE}W(s)}\qquad \mathrm{PoA}=\frac{W(s^*)}{\min_{s\in NE}W(s)}")
+    st.latex(r"\mathrm{PoS}=\frac{W_{\mathrm{opt}}}{\max_{s\in NE}W(s)}\qquad \mathrm{PoA}=\frac{W_{\mathrm{opt}}}{\min_{s\in NE}W(s)}")
     if defined:
         st.caption(f"Defined because {a['ratio_note']}. Welfare gap between the optimum and the best / worst equilibrium: "
                    f"{H._fmt(a['welfare_gap_best_equilibrium'])} / {H._fmt(a['welfare_gap_worst_equilibrium'])}.")
@@ -291,6 +388,91 @@ def render_analysis_tab(bundle, engine, scenario: dict, profile: list, set_profi
     if st.button("Load into Assignment tab", key="analysis_load_button"):
         set_profile(list(options[label]))
         st.rerun()
+
+    # ---- strategy-space structure
+    st.markdown("### 7 · Structure of the strategy space")
+    st.caption("Descriptive statistics over **all** assignments, from the same exhaustive scan.")
+    d = cached_distributions(scenario_key(scenario))
+    wd = d["welfare"]
+    c = st.columns(4)
+    c[0].metric("Lowest welfare", H._fmt(wd["min"]), help=f"Reached by {len(wd['min_profiles'])} assignment(s).")
+    c[1].metric("Median welfare", H._fmt(wd["median"]))
+    c[2].metric("Mean welfare", f"{wd['mean']:.2f}")
+    c[3].metric("Highest welfare", H._fmt(wd["max"]), help=f"Reached by {len(wd['max_profiles'])} assignment(s).")
+    sizes_all = [r["size"] for r in d["largest_team"]]
+    eq_sizes = sorted(r["size"] for r in d["largest_team"] if r["n_equilibria"])
+    if eq_sizes:
+        st.markdown(f"Equilibria in this scenario occur only when the largest team has size **{', '.join(map(str, eq_sizes))}** "
+                    f"(possible sizes: {', '.join(map(str, sizes_all))}). This is a measured fact about this scenario, not a general law: "
+                    "with these weights crowding makes lopsided assignments unstable.")
+    st.plotly_chart(largest_team_chart(d), width="stretch")
+    shapes = [{"Team sizes (non-empty teams)": " + ".join(map(str, r["shape"])), "Assignments": r["n_profiles"],
+               "Equilibria": r["n_equilibria"], "Mean welfare": round(r["mean_welfare"], 2)} for r in d["team_shapes"]]
+    with st.expander(f"Team-size patterns ({len(shapes)})"):
+        st.dataframe(pd.DataFrame(shapes), width="stretch", hide_index=True)
+    st.plotly_chart(equilibrium_project_heatmap(d, scenario), width="stretch")
+    st.caption("A cell shows in how many of the equilibria that student is on that project; a row concentrated in one cell "
+               "means the student's project is essentially settled, a spread-out row means the student is pivotal.")
+    ps = [{"Student": scenario["students"][r["student"]], "Lowest": r["min"], "Mean": round(r["mean"], 2), "Highest": r["max"],
+           "At welfare optimum": r["at_optimum"], "Lowest in an equilibrium": r["equilibrium_min"],
+           "Highest in an equilibrium": r["equilibrium_max"]} for r in d["per_student"]]
+    with st.expander("Each student's utility range over all assignments and over the equilibria"):
+        st.dataframe(pd.DataFrame(ps), width="stretch", hide_index=True)
+    st.plotly_chart(utility_histogram_chart(d), width="stretch")
+
+    # ---- best-response outcomes from every start
+    st.markdown("### 8 · Best-response dynamics from every starting assignment")
+    order = st.radio("Update order", ["round_robin", "random"], horizontal=True, key="analysis_basin_order",
+                     help="round_robin visits students 0..n-1 each sweep (deterministic). random uses a seeded shuffle per sweep, "
+                          "the seed being the start's enumeration index, so the analysis is reproducible.")
+    b = cached_basins(scenario_key(scenario), order)
+    c = st.columns(4)
+    c[0].metric("Runs (one per start)", f"{b['n_runs']:,}")
+    c[1].metric("Converged", f"{b['n_converged']:,}", help="A run converged if a full sweep produced no move.")
+    c[2].metric("Longest run (moves)", b["max_steps"], help=f"Mean {b['mean_steps']:.2f} moves; at most {b['max_rounds_used']} sweeps.")
+    c[3].metric("Distinct end points", b["n_endpoints"], help="Different final assignments reached over all starts.")
+    if b["n_not_converged"] or b["n_final_not_nash"]:
+        st.error(f"{b['n_not_converged']} run(s) did not converge and {b['n_final_not_nash']} ended in a non-equilibrium. "
+                 "Under the model's assumptions this should not happen; treat the model inputs as suspect.")
+    else:
+        st.success(f"All {b['n_runs']:,} runs converged, and every final assignment passes a fresh equilibrium check. "
+                   f"{b['n_equilibria_unreached']} of the {a['n_equilibria']} equilibria are not the end point of any start.", icon="✅")
+    st.plotly_chart(basin_chart(b, scenario, opt["welfare"]), width="stretch")
+    st.caption(
+        "Each bar is an equilibrium; its length is the number of starting assignments (out of all "
+        f"{b['n_runs']:,}) whose dynamics end there, and it is green if it maximises welfare. Best-response dynamics "
+        "does not select the best equilibrium: where it ends depends on the start. **Cycles cannot occur in this model** "
+        "because Φ is an exact potential (every move raises Φ by the mover's gain, so no assignment can be revisited); "
+        "the counters above are measured, not assumed.")
+    with st.expander("Distribution of the number of moves"):
+        sh = b["step_histogram"]
+        fig = go.Figure(go.Bar(x=[r["steps"] for r in sh], y=[r["n_runs"] for r in sh], marker_color=ACCENT,
+                               hovertemplate="%{x} moves<br>%{y} starts<extra></extra>"))
+        fig.update_xaxes(title="Moves until no student wants to deviate", dtick=1)
+        fig.update_yaxes(title="Number of starting assignments")
+        st.plotly_chart(H._base_layout(fig, "Length of best-response runs", height=300), width="stretch")
+
+    # ---- sensitivity
+    st.markdown("### 9 · Sensitivity to the model parameters")
+    st.caption("Each point re-solves the whole game on an **independent copy** of the scenario with one parameter changed. "
+               "The active scenario, and the results in sections 1–8, are never modified.")
+    param = st.selectbox("Parameter to vary", list(SWEEPS), format_func=lambda k: SWEEPS[k][0], key="analysis_sweep_param")
+    title, values, short = SWEEPS[param]
+    baseline = scenario["gamma"] if param == "gamma" else 1.0
+    rows = cached_sweep(scenario_key(scenario), param, tuple(values))
+    f_eq, f_w = sensitivity_charts(rows, short, baseline)
+    c1, c2 = st.columns(2)
+    c1.plotly_chart(f_eq, width="stretch")
+    c2.plotly_chart(f_w, width="stretch")
+    st.dataframe(pd.DataFrame([{
+        title.split(" (")[0]: r["value"], "Pure equilibria": r["n_equilibria"], "Max welfare": r["optimal_welfare"],
+        "Best equilibrium": r["best_equilibrium_welfare"], "Worst equilibrium": r["worst_equilibrium_welfare"],
+        "Welfare gap (worst)": r["welfare_gap_worst"], "Optima": r["n_optimal_profiles"], "Stable optima": r["n_stable_optima"],
+        "Largest team at optimum": r["largest_team_at_optimum"], "Baseline": "◀ baseline" if abs(r["value"] - baseline) < H.EPS else ""}
+        for r in rows]), width="stretch", hide_index=True)
+    st.caption("These are *what-if* variants computed exhaustively on copies; they are not the project's baseline model. "
+               "Compare the column of equilibrium counts and welfare gaps with the baseline row to see how strongly each "
+               "parameter shapes the strategic outcome.")
 
     with st.expander("Scalability and method"):
         st.markdown(

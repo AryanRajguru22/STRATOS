@@ -17,6 +17,7 @@ Command line:  python game_engine.py --report [--gamma G] [--seeds N] [--timing-
 from __future__ import annotations
 
 import argparse
+import copy
 import itertools
 import json
 import math
@@ -636,6 +637,175 @@ def analyze_landscape(scenario: Any, max_profiles: int = MAX_ENUMERATION_PROFILE
         "welfare_potential_points": [{"welfare": w_, "potential": p_, "is_equilibrium": e_, "count": c}
                                      for (w_, p_, e_), c in sorted(points.items())],
     }
+
+
+def analyze_distributions(scenario: Any, max_profiles: int = MAX_ENUMERATION_PROFILES) -> dict:
+    """Descriptive statistics over ALL m**n profiles, from the same single scan that analyze_landscape uses.
+
+    team_shapes          [{shape, n_profiles, n_equilibria, mean_welfare}]  'shape' is the descending list of NON-EMPTY
+                         team sizes, e.g. [3, 3, 2]; sorted by n_profiles descending
+    largest_team         [{size, n_profiles, n_equilibria}]  distribution of the largest team size
+    welfare              {min, max, mean, median, min_profiles, max_profiles}  (all minimisers / maximisers listed)
+    per_student          [{student, min, max, mean, at_optimum, equilibrium_min, equilibrium_max}]  utility ranges
+    equilibrium_project_counts   [student][project] = number of equilibria in which that student is on that project
+    utility_histogram    [{utility, n_student_profiles, n_in_equilibria}] over every (profile, student) pair
+    """
+    scan = _Scan(_compile(scenario), max_profiles)
+    M, profiles, utils_all, welfare_all = scan.M, scan.profiles, scan.utils, scan.welfare
+    eq_set = set(scan.eq_idx)
+    total, n, m = len(profiles), M.n, M.m
+
+    shapes: dict = {}
+    largest: dict = {}
+    for k, p in enumerate(profiles):
+        sizes = [0] * m
+        for t in p:
+            sizes[t] += 1
+        shape = tuple(sorted((x for x in sizes if x), reverse=True))
+        is_eq = k in eq_set
+        row = shapes.setdefault(shape, [0, 0, 0])
+        row[0] += 1
+        row[1] += is_eq
+        row[2] += welfare_all[k]
+        big = largest.setdefault(shape[0], [0, 0])
+        big[0] += 1
+        big[1] += is_eq
+
+    w_min, w_max = min(welfare_all), max(welfare_all)
+    ordered = sorted(welfare_all)
+    median = ordered[total // 2] if total % 2 else (ordered[total // 2 - 1] + ordered[total // 2]) / 2
+    opt_k = next(k for k, v in enumerate(welfare_all) if v >= w_max - EPS)
+
+    per_student = []
+    for i in range(n):
+        col = [u[i] for u in utils_all]
+        eq_col = [utils_all[k][i] for k in scan.eq_idx]
+        per_student.append({"student": i, "min": min(col), "max": max(col), "mean": sum(col) / total,
+                            "at_optimum": utils_all[opt_k][i],
+                            "equilibrium_min": min(eq_col) if eq_col else None,
+                            "equilibrium_max": max(eq_col) if eq_col else None})
+    eq_counts = [[0] * m for _ in range(n)]
+    for k in scan.eq_idx:
+        for i, t in enumerate(profiles[k]):
+            eq_counts[i][t] += 1
+
+    hist: dict = {}
+    for k, u in enumerate(utils_all):
+        is_eq = k in eq_set
+        for x in u:
+            row = hist.setdefault(x, [0, 0])
+            row[0] += 1
+            row[1] += is_eq
+    return {
+        "n_profiles": total,
+        "team_shapes": [{"shape": list(sh), "n_profiles": a, "n_equilibria": b, "mean_welfare": c / a}
+                        for sh, (a, b, c) in sorted(shapes.items(), key=lambda kv: (-kv[1][0], kv[0]))],
+        "largest_team": [{"size": sz, "n_profiles": a, "n_equilibria": b} for sz, (a, b) in sorted(largest.items())],
+        "welfare": {"min": w_min, "max": w_max, "mean": sum(welfare_all) / total, "median": median,
+                    "min_profiles": [list(profiles[k]) for k, v in enumerate(welfare_all) if v <= w_min + EPS],
+                    "max_profiles": [list(profiles[k]) for k, v in enumerate(welfare_all) if v >= w_max - EPS]},
+        "per_student": per_student,
+        "equilibrium_project_counts": eq_counts,
+        "utility_histogram": [{"utility": x, "n_student_profiles": a, "n_in_equilibria": b}
+                              for x, (a, b) in sorted(hist.items())],
+    }
+
+
+def analyze_basins(scenario: Any, order: str = "round_robin", max_rounds: int = 100,
+                   max_profiles: int = MAX_ENUMERATION_PROFILES) -> dict:
+    """Run best-response dynamics from EVERY profile and report where each run ends.
+
+    order 'round_robin' is deterministic. order 'random' uses the profile's enumeration index as the seed, so the
+    whole analysis is reproducible. Nothing is assumed: every run reports its own 'converged' flag and a fresh
+    equilibrium check, and runs that fail either are counted in 'n_not_converged' / 'n_final_not_nash'.
+
+    n_runs, order, n_converged, n_not_converged, n_final_not_nash, max_steps, mean_steps, max_rounds_used,
+    step_histogram [{steps, n_runs}], endpoints [{profile, welfare, is_equilibrium, basin_size, share}] sorted by
+    basin size descending, n_endpoints, n_equilibria_unreached (pure equilibria that no start reaches).
+    """
+    if order not in VALID_ORDERS:
+        raise StratosError(f"order must be one of {VALID_ORDERS}, got {order!r}")
+    M = _compile(scenario)
+    total = M.m ** M.n
+    if total > max_profiles:
+        raise StratosError(f"{M.m}^{M.n} = {total} profiles exceeds the enumeration limit of {max_profiles}")
+    eq_set = {tuple(e["profile"]) for e in enumerate_equilibria(scenario, with_analysis=False,
+                                                                 max_profiles=max_profiles)["equilibria"]}
+    ends: dict = {}
+    steps_hist: dict = {}
+    n_conv = n_bad = max_steps = max_rounds_used = steps_sum = 0
+    for k, start in enumerate(itertools.product(range(M.m), repeat=M.n)):
+        run = best_response_dynamics(scenario, list(start), order=order, seed=k, max_rounds=max_rounds)
+        n_conv += run["converged"]
+        n_bad += not run["is_nash_final"]
+        ns = len(run["steps"])
+        steps_hist[ns] = steps_hist.get(ns, 0) + 1
+        steps_sum += ns
+        max_steps = max(max_steps, ns)
+        max_rounds_used = max(max_rounds_used, run["rounds"])
+        key = tuple(run["final_profile"])
+        ends[key] = ends.get(key, 0) + 1
+    endpoints = [{"profile": list(p), "welfare": social_welfare(list(p), scenario), "is_equilibrium": p in eq_set,
+                  "basin_size": c, "share": c / total} for p, c in sorted(ends.items(), key=lambda kv: (-kv[1], kv[0]))]
+    return {"order": order, "n_runs": total, "n_converged": n_conv, "n_not_converged": total - n_conv,
+            "n_final_not_nash": n_bad, "max_steps": max_steps, "mean_steps": steps_sum / total,
+            "max_rounds_used": max_rounds_used,
+            "step_histogram": [{"steps": s_, "n_runs": c} for s_, c in sorted(steps_hist.items())],
+            "endpoints": endpoints, "n_endpoints": len(endpoints),
+            "n_equilibria_unreached": len(eq_set - set(ends))}
+
+
+SENSITIVITY_PARAMETERS = ("gamma", "compatibility_scale", "preference_scale")
+
+
+def sensitivity_variant(scenario: Any, parameter: str, value: Any) -> dict:
+    """An explicit, independent COPY of the scenario with one parameter changed; the argument is never touched.
+
+    'gamma' sets the crowding strength to value (>= 0); 'compatibility_scale' multiplies every w[i][j] by value
+    (symmetry is preserved); 'preference_scale' multiplies every pref[i][t] by value. value 1 of either scale
+    reproduces the baseline exactly.
+    """
+    if parameter not in SENSITIVITY_PARAMETERS:
+        raise StratosError(f"parameter must be one of {SENSITIVITY_PARAMETERS}, got {parameter!r}")
+    M = _compile(scenario)
+    v = _num(value, "sensitivity value", StratosError)
+    out = copy.deepcopy(scenario)
+    if parameter == "gamma":
+        if v < 0:
+            raise StratosError(f"gamma must be >= 0, got {v}")
+        out["gamma"] = v
+    elif parameter == "compatibility_scale":
+        out["w"] = [[x * v for x in row] for row in M.w]
+    else:
+        out["pref"] = [[x * v for x in row] for row in M.pref]
+    _compile(out)
+    return out
+
+
+def sensitivity_sweep(scenario: Any, parameter: str, values: Sequence,
+                      max_profiles: int = MAX_ENUMERATION_PROFILES) -> list:
+    """Exhaustive equilibrium analysis of the scenario at each value of one parameter (see sensitivity_variant).
+
+    One row per value: value, n_equilibria, optimal_welfare, n_optimal_profiles, n_stable_optima (optima that are
+    equilibria), best_equilibrium_welfare, worst_equilibrium_welfare (None if no equilibrium), welfare_gap_best,
+    welfare_gap_worst, largest_team_at_optimum, optimal_profile. The baseline scenario is never modified.
+    """
+    rows = []
+    for v in values:
+        sc = sensitivity_variant(scenario, parameter, v)
+        e = enumerate_equilibria(sc, with_analysis=False, max_profiles=max_profiles)
+        eq_w = [x["welfare"] for x in e["equilibria"]]
+        eq_set = {tuple(x["profile"]) for x in e["equilibria"]}
+        opt = e["optimal"]["profile"]
+        rows.append({"value": v, "n_equilibria": e["n_equilibria"], "optimal_welfare": e["optimal"]["welfare"],
+                     "n_optimal_profiles": len(e["optimal_profiles"]),
+                     "n_stable_optima": sum(tuple(p) in eq_set for p in e["optimal_profiles"]),
+                     "best_equilibrium_welfare": max(eq_w) if eq_w else None,
+                     "worst_equilibrium_welfare": min(eq_w) if eq_w else None,
+                     "welfare_gap_best": e["welfare_gap_best_equilibrium"],
+                     "welfare_gap_worst": e["welfare_gap_worst_equilibrium"],
+                     "largest_team_at_optimum": max(opt.count(t) for t in set(opt)), "optimal_profile": list(opt)})
+    return rows
 
 
 # ----------------------------------------------------------------------------------------------
