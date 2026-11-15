@@ -75,11 +75,9 @@ def main():
             "preference_scale": ge.sensitivity_sweep(sc, "preference_scale", [0.25 * k for k in range(9)]),
         },
     }
-    with open(os.path.join(OUT, "analysis_report.json"), "w", encoding="utf-8", newline="
-") as f:
+    with open(os.path.join(OUT, "analysis_report.json"), "w", encoding="utf-8", newline="\n") as f:
         json.dump(analysis, f, indent=1)
-        f.write("
-")
+        f.write("\n")
 
     # 2. tests
     tests = run(PY, "-m", "pytest", "-q", "-p", "no:cacheprovider")
