@@ -1,0 +1,2219 @@
+{
+ "note": "Default (synthetic) scenario; sensitivity variants are computed on independent copies.",
+ "meta": {
+  "generated_at": "2026-11-15 15:04:35 +0530",
+  "git": {
+   "commit": "d0b3bd26df717e01fdefc0cb0727c3e300e8b175",
+   "branch": "main",
+   "uncommitted_paths": 0,
+   "note": "working tree clean: results describe exactly this commit"
+  }
+ },
+ "distributions": {
+  "n_profiles": 6561,
+  "team_shapes": [
+   {
+    "shape": [
+     3,
+     3,
+     2
+    ],
+    "n_profiles": 1680,
+    "n_equilibria": 23,
+    "mean_welfare": 8.166666666666666
+   },
+   {
+    "shape": [
+     4,
+     3,
+     1
+    ],
+    "n_profiles": 1680,
+    "n_equilibria": 0,
+    "mean_welfare": -31.11904761904762
+   },
+   {
+    "shape": [
+     4,
+     2,
+     2
+    ],
+    "n_profiles": 1260,
+    "n_equilibria": 0,
+    "mean_welfare": -17.476190476190474
+   },
+   {
+    "shape": [
+     5,
+     2,
+     1
+    ],
+    "n_profiles": 1008,
+    "n_equilibria": 0,
+    "mean_welfare": -94.4047619047619
+   },
+   {
+    "shape": [
+     5,
+     3
+    ],
+    "n_profiles": 336,
+    "n_equilibria": 0,
+    "mean_welfare": -109.69047619047619
+   },
+   {
+    "shape": [
+     4,
+     4
+    ],
+    "n_profiles": 210,
+    "n_equilibria": 0,
+    "mean_welfare": -72.04761904761905
+   },
+   {
+    "shape": [
+     6,
+     1,
+     1
+    ],
+    "n_profiles": 168,
+    "n_equilibria": 0,
+    "mean_welfare": -220.97619047619048
+   },
+   {
+    "shape": [
+     6,
+     2
+    ],
+    "n_profiles": 168,
+    "n_equilibria": 0,
+    "mean_welfare": -222.61904761904762
+   },
+   {
+    "shape": [
+     7,
+     1
+    ],
+    "n_profiles": 48,
+    "n_equilibria": 0,
+    "mean_welfare": -410.8333333333333
+   },
+   {
+    "shape": [
+     8
+    ],
+    "n_profiles": 3,
+    "n_equilibria": 0,
+    "mean_welfare": -674.3333333333334
+   }
+  ],
+  "largest_team": [
+   {
+    "size": 3,
+    "n_profiles": 1680,
+    "n_equilibria": 23
+   },
+   {
+    "size": 4,
+    "n_profiles": 3150,
+    "n_equilibria": 0
+   },
+   {
+    "size": 5,
+    "n_profiles": 1344,
+    "n_equilibria": 0
+   },
+   {
+    "size": 6,
+    "n_profiles": 336,
+    "n_equilibria": 0
+   },
+   {
+    "size": 7,
+    "n_profiles": 48,
+    "n_equilibria": 0
+   },
+   {
+    "size": 8,
+    "n_profiles": 3,
+    "n_equilibria": 0
+   }
+  ],
+  "welfare": {
+   "min": -677,
+   "max": 29,
+   "mean": -46.333333333333336,
+   "median": -26,
+   "min_profiles": [
+    [
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1,
+     1
+    ]
+   ],
+   "max_profiles": [
+    [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     2,
+     1,
+     2,
+     2
+    ]
+   ]
+  },
+  "per_student": [
+   {
+    "student": 0,
+    "min": -88,
+    "max": 9,
+    "mean": -6.0,
+    "at_optimum": 3,
+    "equilibrium_min": -1,
+    "equilibrium_max": 7
+   },
+   {
+    "student": 1,
+    "min": -89,
+    "max": 9,
+    "mean": -6.333333333333333,
+    "at_optimum": 3,
+    "equilibrium_min": -2,
+    "equilibrium_max": 5
+   },
+   {
+    "student": 2,
+    "min": -87,
+    "max": 10,
+    "mean": -6.0,
+    "at_optimum": 4,
+    "equilibrium_min": -1,
+    "equilibrium_max": 8
+   },
+   {
+    "student": 3,
+    "min": -85,
+    "max": 9,
+    "mean": -4.666666666666667,
+    "at_optimum": 4,
+    "equilibrium_min": 1,
+    "equilibrium_max": 7
+   },
+   {
+    "student": 4,
+    "min": -86,
+    "max": 10,
+    "mean": -5.0,
+    "at_optimum": -1,
+    "equilibrium_min": -1,
+    "equilibrium_max": 8
+   },
+   {
+    "student": 5,
+    "min": -89,
+    "max": 8,
+    "mean": -7.0,
+    "at_optimum": 2,
+    "equilibrium_min": -1,
+    "equilibrium_max": 6
+   },
+   {
+    "student": 6,
+    "min": -88,
+    "max": 9,
+    "mean": -6.0,
+    "at_optimum": 9,
+    "equilibrium_min": -2,
+    "equilibrium_max": 9
+   },
+   {
+    "student": 7,
+    "min": -85,
+    "max": 7,
+    "mean": -5.333333333333333,
+    "at_optimum": 5,
+    "equilibrium_min": 0,
+    "equilibrium_max": 5
+   }
+  ],
+  "equilibrium_project_counts": [
+   [
+    12,
+    10,
+    1
+   ],
+   [
+    14,
+    0,
+    9
+   ],
+   [
+    1,
+    20,
+    2
+   ],
+   [
+    10,
+    0,
+    13
+   ],
+   [
+    16,
+    0,
+    7
+   ],
+   [
+    5,
+    17,
+    1
+   ],
+   [
+    2,
+    3,
+    18
+   ],
+   [
+    7,
+    9,
+    7
+   ]
+  ],
+  "utility_histogram": [
+   {
+    "utility": -89,
+    "n_student_profiles": 2,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -88,
+    "n_student_profiles": 3,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -87,
+    "n_student_profiles": 1,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -86,
+    "n_student_profiles": 2,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -85,
+    "n_student_profiles": 4,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -84,
+    "n_student_profiles": 3,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -83,
+    "n_student_profiles": 1,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -82,
+    "n_student_profiles": 2,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -81,
+    "n_student_profiles": 4,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -80,
+    "n_student_profiles": 1,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -79,
+    "n_student_profiles": 1,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -65,
+    "n_student_profiles": 12,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -64,
+    "n_student_profiles": 22,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -63,
+    "n_student_profiles": 30,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -62,
+    "n_student_profiles": 28,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -61,
+    "n_student_profiles": 38,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -60,
+    "n_student_profiles": 38,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -59,
+    "n_student_profiles": 38,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -58,
+    "n_student_profiles": 30,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -57,
+    "n_student_profiles": 34,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -56,
+    "n_student_profiles": 32,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -55,
+    "n_student_profiles": 24,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -54,
+    "n_student_profiles": 8,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -53,
+    "n_student_profiles": 2,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -45,
+    "n_student_profiles": 20,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -44,
+    "n_student_profiles": 72,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -43,
+    "n_student_profiles": 140,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -42,
+    "n_student_profiles": 172,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -41,
+    "n_student_profiles": 196,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -40,
+    "n_student_profiles": 212,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -39,
+    "n_student_profiles": 232,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -38,
+    "n_student_profiles": 216,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -37,
+    "n_student_profiles": 212,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -36,
+    "n_student_profiles": 192,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -35,
+    "n_student_profiles": 176,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -34,
+    "n_student_profiles": 120,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -33,
+    "n_student_profiles": 44,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -32,
+    "n_student_profiles": 12,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -29,
+    "n_student_profiles": 8,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -28,
+    "n_student_profiles": 96,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -27,
+    "n_student_profiles": 248,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -26,
+    "n_student_profiles": 496,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -25,
+    "n_student_profiles": 608,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -24,
+    "n_student_profiles": 664,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -23,
+    "n_student_profiles": 696,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -22,
+    "n_student_profiles": 784,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -21,
+    "n_student_profiles": 736,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -20,
+    "n_student_profiles": 712,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -19,
+    "n_student_profiles": 648,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -18,
+    "n_student_profiles": 544,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -17,
+    "n_student_profiles": 320,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -16,
+    "n_student_profiles": 168,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -15,
+    "n_student_profiles": 200,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -14,
+    "n_student_profiles": 592,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -13,
+    "n_student_profiles": 1024,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -12,
+    "n_student_profiles": 1296,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -11,
+    "n_student_profiles": 1328,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -10,
+    "n_student_profiles": 1472,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -9,
+    "n_student_profiles": 1488,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -8,
+    "n_student_profiles": 1552,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -7,
+    "n_student_profiles": 1456,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -6,
+    "n_student_profiles": 1536,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -5,
+    "n_student_profiles": 1712,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -4,
+    "n_student_profiles": 1904,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -3,
+    "n_student_profiles": 1856,
+    "n_in_equilibria": 0
+   },
+   {
+    "utility": -2,
+    "n_student_profiles": 1648,
+    "n_in_equilibria": 4
+   },
+   {
+    "utility": -1,
+    "n_student_profiles": 1888,
+    "n_in_equilibria": 11
+   },
+   {
+    "utility": 0,
+    "n_student_profiles": 2240,
+    "n_in_equilibria": 27
+   },
+   {
+    "utility": 1,
+    "n_student_profiles": 3104,
+    "n_in_equilibria": 29
+   },
+   {
+    "utility": 2,
+    "n_student_profiles": 3424,
+    "n_in_equilibria": 23
+   },
+   {
+    "utility": 3,
+    "n_student_profiles": 3008,
+    "n_in_equilibria": 32
+   },
+   {
+    "utility": 4,
+    "n_student_profiles": 2432,
+    "n_in_equilibria": 13
+   },
+   {
+    "utility": 5,
+    "n_student_profiles": 2240,
+    "n_in_equilibria": 4
+   },
+   {
+    "utility": 6,
+    "n_student_profiles": 1632,
+    "n_in_equilibria": 16
+   },
+   {
+    "utility": 7,
+    "n_student_profiles": 1600,
+    "n_in_equilibria": 16
+   },
+   {
+    "utility": 8,
+    "n_student_profiles": 1408,
+    "n_in_equilibria": 5
+   },
+   {
+    "utility": 9,
+    "n_student_profiles": 1216,
+    "n_in_equilibria": 4
+   },
+   {
+    "utility": 10,
+    "n_student_profiles": 128,
+    "n_in_equilibria": 0
+   }
+  ]
+ },
+ "basins": {
+  "round_robin": {
+   "order": "round_robin",
+   "n_runs": 6561,
+   "n_converged": 6561,
+   "n_not_converged": 0,
+   "n_final_not_nash": 0,
+   "max_steps": 13,
+   "mean_steps": 5.398414875781131,
+   "max_rounds_used": 5,
+   "step_histogram": [
+    {
+     "steps": 0,
+     "n_runs": 23
+    },
+    {
+     "steps": 1,
+     "n_runs": 99
+    },
+    {
+     "steps": 2,
+     "n_runs": 293
+    },
+    {
+     "steps": 3,
+     "n_runs": 657
+    },
+    {
+     "steps": 4,
+     "n_runs": 1033
+    },
+    {
+     "steps": 5,
+     "n_runs": 1313
+    },
+    {
+     "steps": 6,
+     "n_runs": 1281
+    },
+    {
+     "steps": 7,
+     "n_runs": 991
+    },
+    {
+     "steps": 8,
+     "n_runs": 540
+    },
+    {
+     "steps": 9,
+     "n_runs": 232
+    },
+    {
+     "steps": 10,
+     "n_runs": 68
+    },
+    {
+     "steps": 11,
+     "n_runs": 21
+    },
+    {
+     "steps": 12,
+     "n_runs": 6
+    },
+    {
+     "steps": 13,
+     "n_runs": 4
+    }
+   ],
+   "endpoints": [
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      2,
+      0,
+      1,
+      2,
+      0
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 1033,
+     "share": 0.15744551135497636
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      2,
+      2,
+      1,
+      2,
+      0
+     ],
+     "welfare": 23,
+     "is_equilibrium": true,
+     "basin_size": 1007,
+     "share": 0.15348270080780368
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      0,
+      2,
+      1,
+      2,
+      1
+     ],
+     "welfare": 27,
+     "is_equilibrium": true,
+     "basin_size": 849,
+     "share": 0.12940100594421583
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      0,
+      0,
+      1,
+      2,
+      2
+     ],
+     "welfare": 28,
+     "is_equilibrium": true,
+     "basin_size": 643,
+     "share": 0.09800335314738606
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      0,
+      2,
+      1,
+      2,
+      2
+     ],
+     "welfare": 29,
+     "is_equilibrium": true,
+     "basin_size": 558,
+     "share": 0.0850480109739369
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      2,
+      0,
+      1,
+      2,
+      1
+     ],
+     "welfare": 19,
+     "is_equilibrium": true,
+     "basin_size": 539,
+     "share": 0.08215211095869532
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      0,
+      2,
+      1,
+      2,
+      0
+     ],
+     "welfare": 24,
+     "is_equilibrium": true,
+     "basin_size": 285,
+     "share": 0.04343850022862369
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      2,
+      0,
+      1,
+      2,
+      0
+     ],
+     "welfare": 20,
+     "is_equilibrium": true,
+     "basin_size": 254,
+     "share": 0.03871361073007164
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      2,
+      2,
+      1,
+      0,
+      0
+     ],
+     "welfare": 16,
+     "is_equilibrium": true,
+     "basin_size": 227,
+     "share": 0.034598384392623076
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      0,
+      2,
+      1,
+      2,
+      0
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 192,
+     "share": 0.029263831732967534
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      2,
+      0,
+      1,
+      2,
+      2
+     ],
+     "welfare": 21,
+     "is_equilibrium": true,
+     "basin_size": 189,
+     "share": 0.02880658436213992
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      2,
+      2
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 140,
+     "share": 0.021338210638622162
+    },
+    {
+     "profile": [
+      2,
+      0,
+      1,
+      2,
+      0,
+      1,
+      2,
+      0
+     ],
+     "welfare": 24,
+     "is_equilibrium": true,
+     "basin_size": 134,
+     "share": 0.020423715896966926
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      2,
+      0,
+      0,
+      2,
+      1
+     ],
+     "welfare": 21,
+     "is_equilibrium": true,
+     "basin_size": 93,
+     "share": 0.01417466849565615
+    },
+    {
+     "profile": [
+      1,
+      2,
+      1,
+      0,
+      0,
+      0,
+      2,
+      2
+     ],
+     "welfare": 24,
+     "is_equilibrium": true,
+     "basin_size": 90,
+     "share": 0.013717421124828532
+    },
+    {
+     "profile": [
+      0,
+      2,
+      2,
+      2,
+      0,
+      1,
+      1,
+      1
+     ],
+     "welfare": 20,
+     "is_equilibrium": true,
+     "basin_size": 89,
+     "share": 0.01356500533455266
+    },
+    {
+     "profile": [
+      1,
+      2,
+      1,
+      0,
+      0,
+      0,
+      2,
+      1
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 67,
+     "share": 0.010211857948483463
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      0,
+      2,
+      0,
+      2,
+      1
+     ],
+     "welfare": 25,
+     "is_equilibrium": true,
+     "basin_size": 63,
+     "share": 0.009602194787379973
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      2,
+      0,
+      1,
+      0,
+      2
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 36,
+     "share": 0.0054869684499314125
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      2,
+      0,
+      1,
+      1,
+      2
+     ],
+     "welfare": 19,
+     "is_equilibrium": true,
+     "basin_size": 28,
+     "share": 0.004267642127724432
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      2,
+      2,
+      1
+     ],
+     "welfare": 21,
+     "is_equilibrium": true,
+     "basin_size": 18,
+     "share": 0.0027434842249657062
+    },
+    {
+     "profile": [
+      1,
+      0,
+      2,
+      2,
+      0,
+      0,
+      1,
+      1
+     ],
+     "welfare": 18,
+     "is_equilibrium": true,
+     "basin_size": 18,
+     "share": 0.0027434842249657062
+    },
+    {
+     "profile": [
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      2,
+      1
+     ],
+     "welfare": 19,
+     "is_equilibrium": true,
+     "basin_size": 9,
+     "share": 0.0013717421124828531
+    }
+   ],
+   "n_endpoints": 23,
+   "n_equilibria_unreached": 0
+  },
+  "random": {
+   "order": "random",
+   "n_runs": 6561,
+   "n_converged": 6561,
+   "n_not_converged": 0,
+   "n_final_not_nash": 0,
+   "max_steps": 13,
+   "mean_steps": 5.619417771681146,
+   "max_rounds_used": 7,
+   "step_histogram": [
+    {
+     "steps": 0,
+     "n_runs": 23
+    },
+    {
+     "steps": 1,
+     "n_runs": 107
+    },
+    {
+     "steps": 2,
+     "n_runs": 325
+    },
+    {
+     "steps": 3,
+     "n_runs": 608
+    },
+    {
+     "steps": 4,
+     "n_runs": 968
+    },
+    {
+     "steps": 5,
+     "n_runs": 1177
+    },
+    {
+     "steps": 6,
+     "n_runs": 1167
+    },
+    {
+     "steps": 7,
+     "n_runs": 960
+    },
+    {
+     "steps": 8,
+     "n_runs": 621
+    },
+    {
+     "steps": 9,
+     "n_runs": 341
+    },
+    {
+     "steps": 10,
+     "n_runs": 166
+    },
+    {
+     "steps": 11,
+     "n_runs": 72
+    },
+    {
+     "steps": 12,
+     "n_runs": 18
+    },
+    {
+     "steps": 13,
+     "n_runs": 8
+    }
+   ],
+   "endpoints": [
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      0,
+      0,
+      1,
+      2,
+      2
+     ],
+     "welfare": 28,
+     "is_equilibrium": true,
+     "basin_size": 918,
+     "share": 0.13991769547325103
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      2,
+      0,
+      1,
+      2,
+      1
+     ],
+     "welfare": 19,
+     "is_equilibrium": true,
+     "basin_size": 845,
+     "share": 0.12879134278311233
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      0,
+      2,
+      1,
+      2,
+      1
+     ],
+     "welfare": 27,
+     "is_equilibrium": true,
+     "basin_size": 759,
+     "share": 0.11568358481938729
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      2,
+      2,
+      1,
+      2,
+      0
+     ],
+     "welfare": 23,
+     "is_equilibrium": true,
+     "basin_size": 566,
+     "share": 0.08626733729614389
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      2,
+      0,
+      1,
+      2,
+      0
+     ],
+     "welfare": 20,
+     "is_equilibrium": true,
+     "basin_size": 519,
+     "share": 0.07910379515317786
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      0,
+      2,
+      1,
+      2,
+      0
+     ],
+     "welfare": 24,
+     "is_equilibrium": true,
+     "basin_size": 441,
+     "share": 0.06721536351165981
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      2,
+      0,
+      0,
+      2,
+      1
+     ],
+     "welfare": 21,
+     "is_equilibrium": true,
+     "basin_size": 300,
+     "share": 0.04572473708276177
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      2,
+      0,
+      1,
+      2,
+      0
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 276,
+     "share": 0.04206675811614083
+    },
+    {
+     "profile": [
+      2,
+      0,
+      1,
+      2,
+      0,
+      1,
+      2,
+      0
+     ],
+     "welfare": 24,
+     "is_equilibrium": true,
+     "basin_size": 261,
+     "share": 0.039780521262002745
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      2,
+      2
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 234,
+     "share": 0.03566529492455418
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      0,
+      2,
+      1,
+      2,
+      2
+     ],
+     "welfare": 29,
+     "is_equilibrium": true,
+     "basin_size": 223,
+     "share": 0.03398872123151959
+    },
+    {
+     "profile": [
+      0,
+      0,
+      1,
+      2,
+      0,
+      1,
+      2,
+      2
+     ],
+     "welfare": 21,
+     "is_equilibrium": true,
+     "basin_size": 217,
+     "share": 0.03307422648986435
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      0,
+      2,
+      0,
+      2,
+      1
+     ],
+     "welfare": 25,
+     "is_equilibrium": true,
+     "basin_size": 195,
+     "share": 0.029721079103795154
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      0,
+      2,
+      1,
+      2,
+      0
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 138,
+     "share": 0.021033379058070414
+    },
+    {
+     "profile": [
+      1,
+      0,
+      0,
+      2,
+      0,
+      1,
+      2,
+      1
+     ],
+     "welfare": 19,
+     "is_equilibrium": true,
+     "basin_size": 131,
+     "share": 0.019966468526139307
+    },
+    {
+     "profile": [
+      1,
+      2,
+      1,
+      0,
+      0,
+      0,
+      2,
+      1
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 121,
+     "share": 0.018442310623380583
+    },
+    {
+     "profile": [
+      1,
+      0,
+      2,
+      2,
+      0,
+      0,
+      1,
+      1
+     ],
+     "welfare": 18,
+     "is_equilibrium": true,
+     "basin_size": 107,
+     "share": 0.016308489559518365
+    },
+    {
+     "profile": [
+      1,
+      2,
+      1,
+      0,
+      0,
+      0,
+      2,
+      2
+     ],
+     "welfare": 24,
+     "is_equilibrium": true,
+     "basin_size": 74,
+     "share": 0.01127876848041457
+    },
+    {
+     "profile": [
+      0,
+      2,
+      2,
+      2,
+      0,
+      1,
+      1,
+      1
+     ],
+     "welfare": 20,
+     "is_equilibrium": true,
+     "basin_size": 73,
+     "share": 0.011126352690138699
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      2,
+      2,
+      1,
+      0,
+      0
+     ],
+     "welfare": 16,
+     "is_equilibrium": true,
+     "basin_size": 53,
+     "share": 0.008078036884621246
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      2,
+      0,
+      1,
+      0,
+      2
+     ],
+     "welfare": 22,
+     "is_equilibrium": true,
+     "basin_size": 42,
+     "share": 0.006401463191586648
+    },
+    {
+     "profile": [
+      1,
+      0,
+      1,
+      0,
+      0,
+      2,
+      2,
+      1
+     ],
+     "welfare": 21,
+     "is_equilibrium": true,
+     "basin_size": 40,
+     "share": 0.006096631611034903
+    },
+    {
+     "profile": [
+      0,
+      2,
+      1,
+      2,
+      0,
+      1,
+      1,
+      2
+     ],
+     "welfare": 19,
+     "is_equilibrium": true,
+     "basin_size": 28,
+     "share": 0.004267642127724432
+    }
+   ],
+   "n_endpoints": 23,
+   "n_equilibria_unreached": 0
+  }
+ },
+ "sensitivity": {
+  "gamma": [
+   {
+    "value": 0.0,
+    "n_equilibria": 6,
+    "optimal_welfare": 114.0,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 114.0,
+    "worst_equilibrium_welfare": 79.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 35.0,
+    "largest_team_at_optimum": 8,
+    "optimal_profile": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "value": 0.5,
+    "n_equilibria": 4,
+    "optimal_welfare": 68.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 68.0,
+    "worst_equilibrium_welfare": 58.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 10.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.0,
+    "n_equilibria": 19,
+    "optimal_welfare": 55.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 55.0,
+    "worst_equilibrium_welfare": 44.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 11.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.5,
+    "n_equilibria": 23,
+    "optimal_welfare": 42.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 42.0,
+    "worst_equilibrium_welfare": 29.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 2.0,
+    "n_equilibria": 23,
+    "optimal_welfare": 29.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 29.0,
+    "worst_equilibrium_welfare": 16.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 2.5,
+    "n_equilibria": 23,
+    "optimal_welfare": 16.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 16.0,
+    "worst_equilibrium_welfare": 3.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 3.0,
+    "n_equilibria": 23,
+    "optimal_welfare": 3.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 3.0,
+    "worst_equilibrium_welfare": -10.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 3.5,
+    "n_equilibria": 23,
+    "optimal_welfare": -10.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": -10.0,
+    "worst_equilibrium_welfare": -23.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 4.0,
+    "n_equilibria": 23,
+    "optimal_welfare": -23.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": -23.0,
+    "worst_equilibrium_welfare": -36.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 4.5,
+    "n_equilibria": 23,
+    "optimal_welfare": -36.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": -36.0,
+    "worst_equilibrium_welfare": -49.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 5.0,
+    "n_equilibria": 23,
+    "optimal_welfare": -49.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": -49.0,
+    "worst_equilibrium_welfare": -62.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   }
+  ],
+  "compatibility_scale": [
+   {
+    "value": 0.0,
+    "n_equilibria": 3,
+    "optimal_welfare": 15.0,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 15.0,
+    "worst_equilibrium_welfare": 9.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 6.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     2,
+     0,
+     1,
+     2,
+     1
+    ]
+   },
+   {
+    "value": 0.25,
+    "n_equilibria": 5,
+    "optimal_welfare": 16.0,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 16.0,
+    "worst_equilibrium_welfare": 10.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 6.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     2,
+     0,
+     1,
+     2,
+     1
+    ]
+   },
+   {
+    "value": 0.5,
+    "n_equilibria": 11,
+    "optimal_welfare": 19.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 19.0,
+    "worst_equilibrium_welfare": 11.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 8.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     2,
+     1,
+     2,
+     1
+    ]
+   },
+   {
+    "value": 0.75,
+    "n_equilibria": 11,
+    "optimal_welfare": 24.0,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 0,
+    "best_equilibrium_welfare": 23.0,
+    "worst_equilibrium_welfare": 13.0,
+    "welfare_gap_best": 1.0,
+    "welfare_gap_worst": 11.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     2,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.0,
+    "n_equilibria": 23,
+    "optimal_welfare": 29.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 29.0,
+    "worst_equilibrium_welfare": 16.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.25,
+    "n_equilibria": 17,
+    "optimal_welfare": 35.0,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 0,
+    "best_equilibrium_welfare": 34.0,
+    "worst_equilibrium_welfare": 20.0,
+    "welfare_gap_best": 1.0,
+    "welfare_gap_worst": 15.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.5,
+    "n_equilibria": 21,
+    "optimal_welfare": 41.0,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 0,
+    "best_equilibrium_welfare": 39.0,
+    "worst_equilibrium_welfare": 25.0,
+    "welfare_gap_best": 2.0,
+    "welfare_gap_worst": 16.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.75,
+    "n_equilibria": 26,
+    "optimal_welfare": 47.0,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 0,
+    "best_equilibrium_welfare": 44.5,
+    "worst_equilibrium_welfare": 27.0,
+    "welfare_gap_best": 2.5,
+    "welfare_gap_worst": 20.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 2.0,
+    "n_equilibria": 40,
+    "optimal_welfare": 53.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 53.0,
+    "worst_equilibrium_welfare": 30.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 23.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   }
+  ],
+  "preference_scale": [
+   {
+    "value": 0.0,
+    "n_equilibria": 102,
+    "optimal_welfare": -26.0,
+    "n_optimal_profiles": 24,
+    "n_stable_optima": 24,
+    "best_equilibrium_welfare": -26.0,
+    "worst_equilibrium_welfare": -32.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 6.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     1,
+     1,
+     0,
+     2,
+     2,
+     2,
+     1
+    ]
+   },
+   {
+    "value": 0.25,
+    "n_equilibria": 46,
+    "optimal_welfare": -12.75,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": -12.75,
+    "worst_equilibrium_welfare": -19.25,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 6.5,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     2,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 0.5,
+    "n_equilibria": 40,
+    "optimal_welfare": 0.5,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 0.5,
+    "worst_equilibrium_welfare": -11.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 11.5,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 0.75,
+    "n_equilibria": 22,
+    "optimal_welfare": 14.75,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 0,
+    "best_equilibrium_welfare": 13.75,
+    "worst_equilibrium_welfare": 3.5,
+    "welfare_gap_best": 1.0,
+    "welfare_gap_worst": 11.25,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.0,
+    "n_equilibria": 23,
+    "optimal_welfare": 29.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 29.0,
+    "worst_equilibrium_welfare": 16.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 13.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     1,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.25,
+    "n_equilibria": 10,
+    "optimal_welfare": 44.25,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 0,
+    "best_equilibrium_welfare": 43.0,
+    "worst_equilibrium_welfare": 33.75,
+    "welfare_gap_best": 1.25,
+    "welfare_gap_worst": 10.5,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     2,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.5,
+    "n_equilibria": 12,
+    "optimal_welfare": 59.5,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 0,
+    "best_equilibrium_welfare": 58.5,
+    "worst_equilibrium_welfare": 44.5,
+    "welfare_gap_best": 1.0,
+    "welfare_gap_worst": 15.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     2,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 1.75,
+    "n_equilibria": 11,
+    "optimal_welfare": 74.75,
+    "n_optimal_profiles": 1,
+    "n_stable_optima": 0,
+    "best_equilibrium_welfare": 74.25,
+    "worst_equilibrium_welfare": 59.25,
+    "welfare_gap_best": 0.5,
+    "welfare_gap_worst": 15.5,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     2,
+     1,
+     2,
+     2
+    ]
+   },
+   {
+    "value": 2.0,
+    "n_equilibria": 11,
+    "optimal_welfare": 90.0,
+    "n_optimal_profiles": 2,
+    "n_stable_optima": 1,
+    "best_equilibrium_welfare": 90.0,
+    "worst_equilibrium_welfare": 74.0,
+    "welfare_gap_best": 0.0,
+    "welfare_gap_worst": 16.0,
+    "largest_team_at_optimum": 3,
+    "optimal_profile": [
+     0,
+     0,
+     1,
+     0,
+     2,
+     1,
+     2,
+     1
+    ]
+   }
+  ]
+ }
+}
