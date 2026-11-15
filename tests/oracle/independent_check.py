@@ -294,7 +294,7 @@ def compare(rep, rnd_seed=2026, names=None):
             continue
         a = analyse(g)
         P = a["profiles"]
-        sample = pick(P, 400, 2) if not FULL else (P if len(P) <= 800 else rng.sample(P, 2000))
+        sample = pick(P, 400, 2) if not FULL else (P if len(P) <= 2000 else rng.sample(P, 2000))
         n, m = len(g["pref"]), len(g["projects"])
         bad = {k: [] for k in ("utility", "welfare", "potential", "teams", "breakdown", "nash", "deviations",
                                "best_response", "deltaPhi")}
