@@ -38,7 +38,7 @@ The app opens at <http://localhost:8501>. To check the server without a browser:
 The game engine itself (`game_engine.py`, `sample_data.py`) uses only the Python standard library.
 PDF/document tooling (`reportlab`) is **not** needed to run or test the product; see `requirements-docs.txt`.
 
-## 2. The four tabs
+## 2. The six tabs
 
 | Tab | What you do | What it shows | Engine calls |
 |---|---|---|---|
@@ -46,6 +46,11 @@ PDF/document tooling (`reportlab`) is **not** needed to run or test the product;
 | **Assignment** | Choose a project for every student, or press **Random** / **Reset**. | Teams per project, utility per student, social welfare `W(s)`, potential `Φ(s)`, and a utility bar chart. | `random_profile`, `validate_profile`, `teams`, `utilities`, `social_welfare`, `potential` |
 | **Equilibrium** | None (it reads the current assignment). | Whether the assignment is stable; if not, every profitable unilateral move and how many distinct students have one. | `is_nash` |
 | **Simulation** | Choose the update order (`round_robin` or `random`), the seed and the sweep limit in the sidebar, then press **Run dynamics**. | Sweeps, moves, a move-by-move trace, a slider to inspect any intermediate assignment, a welfare/potential chart, and a final status that is re-verified with a fresh `is_nash` call (never taken from the `converged` flag alone). | `best_response_dynamics`, `is_nash`, `teams` |
+| **Analysis** | None (it reads the active scenario; exhaustive for up to 100,000 assignments). | Nine sections: equilibrium landscape; welfare comparison; price of stability / anarchy; Pareto analysis; welfare-vs-potential plot; every equilibrium (loadable into the Assignment tab); **structure of the strategy space** (welfare statistics, team-size patterns, per-student utility ranges, utility histogram, equilibrium-by-project heatmap); **best-response dynamics from every one of the 6,561 starts** (basin sizes, run lengths, convergence counters, both update orders); **sensitivity** to `gamma`, a compatibility scale and a preference scale, re-solved on independent copies (the baseline is never modified). | `analyze_landscape`, `analyze_distributions`, `analyze_basins`, `sensitivity_sweep` |
+| **Guide** | Read. | The model, the definitions and how to read each tab. | n/a |
+
+The sidebar also offers a **crowding-parameter override** (an experiment, clearly labelled), **scenario export/import as JSON**
+(`scenario_io.py`, validated by the engine, never real student data), and the best-response settings.
 
 The header states whether the **real engine** is loaded. If `game_engine.py` or `sample_data.py` is missing, the app
 falls back to a clearly labelled mock; if they are present but fail to import, it shows the import error loudly. To make
@@ -61,10 +66,13 @@ $env:STRATOS_REQUIRE_REAL_ENGINE = "1"; streamlit run app.py
 python -m pytest -q
 ```
 
-The suite covers the engine (`tests/test_game_engine.py`), the engine/UI contract (`tests/test_integration.py`), the
-Streamlit app and its helpers (`tests/test_ui_smoke.py`, using Streamlit's `AppTest`), and an independent recomputation
-of the results (`tests/test_independent_crosscheck.py`). The most recent recorded run, with its commit hash and whether
-the working tree was clean, is in `docs/results/pytest_output.txt`.
+The suite covers the engine (`tests/test_game_engine.py`), the whole-game analyses and scenario I/O (`tests/test_analysis.py`),
+the engine/UI contract (`tests/test_integration.py`), the Streamlit app and its helpers (`tests/test_ui_smoke.py`,
+`tests/test_analysis_tab_ui.py`, using Streamlit's `AppTest`), and three independent recomputations of the results: the integer
+cross-check (`tests/test_independent_crosscheck.py`), the exact-arithmetic oracle with injected-bug detection
+(`tests/test_oracle.py`) and the full 6,561-profile comparison (`tests/test_verification_full.py`). The most recent recorded run,
+with its commit hash and whether the working tree was clean, is in `docs/results/pytest_output.txt`. The mathematical
+verification is written up in [`docs/VERIFICATION.md`](docs/VERIFICATION.md). The full suite takes a couple of minutes.
 
 ## 4. The model in brief
 
@@ -86,7 +94,7 @@ Phi(s) = sum_i pref[i][s_i] + sum over same-team pairs i<j of w[i][j] - sum_t su
 
 ### Default scenario results (8 students, 3 projects, `gamma = 2`)
 
-Regenerated and independently recomputed; evidence is in `docs/results/`.
+Regenerated and independently recomputed; evidence is in `docs/results/` (`engine_report.json`, `analysis_report.json`, `oracle_report.txt`).
 
 | Quantity | Value |
 |---|---|
@@ -100,20 +108,25 @@ Regenerated and independently recomputed; evidence is in `docs/results/`.
 ## 5. Repository structure
 
 ```
-app.py                      Streamlit entry point: the four tabs (thin UI layer)
-app_helpers.py              engine loading (real vs mock), DataFrame and Plotly chart builders
+app.py                      Streamlit entry point: sidebar, session state, the six tabs (thin UI layer)
+app_views.py                Scenario, Assignment, Equilibrium, Simulation and Guide tab renderers
+app_analysis.py             Analysis tab (charts and sections; every number comes from the engine)
+app_helpers.py              engine loading (real vs mock), styling, DataFrame and Plotly chart builders
+scenario_io.py              validated JSON import/export of scenarios
 game_engine.py              the engine: utility, Nash check, dynamics, enumeration, CLI report
 sample_data.py              synthetic scenarios: tiny hand example and the 8-student default
 requirements.txt            application + test dependencies
 requirements-docs.txt       optional: tools used only to build the PDF deliverables
 pytest.ini                  puts the repo root on the import path; tests live in tests/
 docs/MODEL.md               formal model, potential-game proof, algorithms
-docs/INTERFACE.md           the frozen engine <-> UI contract (signatures, return keys, errors)
+docs/INTERFACE.md           the engine <-> UI contract (signatures, return keys, errors; later functions are marked additive)
+docs/VERIFICATION.md        what was independently verified, how, and the results
 docs/results/               reproducible evidence: engine report, test log, timing, cross-check output
 docs/TEAM_WORK_ALLOCATION.md  the team plan
 scripts/generate_results.py regenerates docs/results/ from real commands
 scripts/independent_crosscheck.py  recomputes the results without importing the engine (see below)
-tests/                      engine, integration, UI-smoke and cross-check tests
+tests/                      engine, analysis, integration, UI (AppTest), cross-check and verification tests
+tests/oracle/               independent exact-arithmetic oracle written from docs/MODEL.md (does not import the engine)
 screenshots/                screenshots captured from the running app (see screenshots/INDEX.md)
 deliverables/viva/          printable viva handbook and speaking plan (PDF) and their build scripts
 ```
@@ -122,6 +135,7 @@ deliverables/viva/          printable viva handbook and speaking plan (PDF) and 
 
 ```powershell
 python game_engine.py --report                       # JSON report for the default scenario
+python tests/oracle/independent_check.py --compare --full --report docs/results/oracle_report.txt   # exact-arithmetic oracle
 python scripts/independent_crosscheck.py --compare   # independent recomputation, diffed against the engine
 python scripts/generate_results.py                   # rewrites docs/results/ (engine report, test log, timing, cross-check)
 ```
@@ -136,10 +150,15 @@ describe a commit it was not produced from. `tests/test_integration.py::test_I06
 * Only **unilateral** deviations are analysed; coalitions of students moving together are out of scope.
 * Complete information and a static game; best-response dynamics is a simulated adjustment process, not a repeated game.
 * Exhaustive enumeration is exponential in the number of students and is capped at 100,000 assignments (up to about
-  10 students with 3 projects). The UI does not expose enumeration; the enumeration results come from the CLI report.
-* The optional *Analysis* tab (price of anarchy/stability in the UI) was not built.
-* Not yet verified by the team at the time of writing: the official project title and any faculty-specific rules
-  (`Groups.xlsx` / handout), a formal independent re-implementation and Excel oracle by the verification owner
-  (`tests/oracle/`), and a manual walkthrough on the presentation machine.
+  10 students with 3 projects). The Analysis tab uses it and says so when a scenario exceeds the cap; the other tabs
+  check one assignment at a time and are not limited.
+* The independent oracle and cross-check were written from the same specification as the engine inside the same project: they
+  catch implementation mistakes, not modelling mistakes (see `docs/VERIFICATION.md`). There is no Excel oracle.
+* Not verified by the team at the time of writing: the official project title and any faculty-specific rules
+  (`Groups.xlsx` / handout), and a manual walkthrough on the presentation machine.
+* The printable viva handbook and speaking plan under `deliverables/viva/` were built **before** the Analysis and Guide tabs
+  and the later verification work existed; they describe four tabs and an earlier test count. See
+  `docs/VIVA_ANALYSIS_ADDENDUM.md` for the current facts and answers.
+* Public deployment (for example Streamlit Community Cloud) has not been done; the app runs locally as described above.
 * The *Custom mock scenario* preset uses a frontend-generated random scenario, not the team's dataset; it exists to
   exercise the UI at other sizes.

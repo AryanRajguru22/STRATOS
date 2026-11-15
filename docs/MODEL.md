@@ -135,6 +135,16 @@ as well off and someone strictly better off, up to `EPS`). Guarded by `MAX_ENUME
 * Price of anarchy `W_opt / min_{equilibria} W` and price of stability `W_opt / max_{equilibria} W`, **only when every
   equilibrium welfare (and `W_opt`) is strictly positive**; otherwise `null`. The gaps are always reported.
 
+**Whole-game analyses used by the Analysis tab** (all exhaustive, all built on the same engine primitives, none changes the model):
+
+* `analyze_landscape`: equilibria, welfare optimum, price of stability/anarchy, Pareto status, welfare and potential distributions.
+* `analyze_distributions`: welfare statistics, team-size patterns, per-student utility ranges, utility histogram, and how many
+  equilibria put each student on each project.
+* `analyze_basins`: best-response dynamics from **every** profile (`m^n` runs); reports each endpoint's basin size and any
+  non-convergence or non-equilibrium endpoint (neither occurs here, by the potential argument above).
+* `sensitivity_sweep` / `sensitivity_variant`: re-solve the game on a deep copy with one parameter changed (`gamma`, or a factor
+  applied to all of `w` or all of `pref`). Variants are labelled what-if models; the baseline scenario is never modified.
+
 **Generic checker** (`pure_nash_equilibria`). Exhaustive pure-Nash search for any finite normal-form game, used
 to confirm that a game with no pure equilibrium (matching pennies) returns an empty list, and to cross-check the
 team game through an independent code path.
@@ -159,6 +169,7 @@ team game through an independent code path.
 5. Independent re-implementation by Ayush from this document, and an Excel oracle, must reproduce the
    equilibrium set, welfare optimum and utilities.
 6. UI numbers must equal engine numbers and the CLI report on at least three assignments.
+7. All of the above, with the exact figures and the discrepancy log, is written up in [`VERIFICATION.md`](VERIFICATION.md).
 
 ## 8. Symbol-to-code map
 

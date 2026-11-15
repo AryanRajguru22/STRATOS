@@ -73,6 +73,11 @@ except game_engine.StratosError as exc:
 | `best_response_dynamics(scenario, start, order="round_robin", seed=None, max_rounds=100)` | dict | see 4.4 |
 | `enumerate_equilibria(scenario, with_analysis=True, max_profiles=100000)` | dict | see 4.5 |
 | `pure_nash_equilibria(strategy_counts, payoff_fn)` | `list[list[int]]` | generic finite game; see 4.6 |
+| `utility_breakdown(i, profile, scenario)` | dict | additive: `u_i` split into preference, compatibility, crowding, total, teammates |
+| `analyze_landscape(scenario, max_profiles=100000)` | dict | additive: full exhaustive analysis (equilibria, optimum, PoA/PoS, Pareto, welfare distribution) |
+| `analyze_distributions(scenario, max_profiles=100000)` | dict | additive; see 4.7 |
+| `analyze_basins(scenario, order="round_robin", max_rounds=100, max_profiles=100000)` | dict | additive; see 4.8 |
+| `sensitivity_variant(scenario, parameter, value)` / `sensitivity_sweep(scenario, parameter, values)` | dict / `list[dict]` | additive; see 4.9 |
 | `build_report(scenario=None, n_seeds=200, timing_runs=5)` | dict | what the CLI prints; see 6. The `demo` section is `None` unless the scenario has the default size (the fixed demo start is 8 students) |
 
 `sample_data`: `get_default_scenario()` (8 students, 3 projects, `gamma = 2`; fresh dict each call),
@@ -162,6 +167,30 @@ Calling this takes about a tenth of a second for the default scenario on the dev
 `strategy_counts[p]` = number of strategies of player `p`; `payoff_fn(profile_tuple)` returns the payoff of every
 player (a sequence of length `len(strategy_counts)`). Returns every pure equilibrium as a list of lists; `[]` means
 **no pure equilibrium exists** (for example matching pennies). Not needed by the UI.
+
+### 4.7 `analyze_distributions` (additive)
+
+One scan over all `m**n` profiles (same cap as 4.5). Keys: `n_profiles`; `team_shapes` (`shape` = descending non-empty team
+sizes, e.g. `[3, 3, 2]`, with `n_profiles`, `n_equilibria`, `mean_welfare`); `largest_team` (`size`, `n_profiles`,
+`n_equilibria`); `welfare` (`min`, `max`, `mean`, `median`, `min_profiles`, `max_profiles`); `per_student` (utility `min`, `max`,
+`mean`, `at_optimum`, `equilibrium_min`, `equilibrium_max`); `equilibrium_project_counts[student][project]`; `utility_histogram`
+(`utility`, `n_student_profiles`, `n_in_equilibria`).
+
+### 4.8 `analyze_basins` (additive)
+
+Runs `best_response_dynamics` from **every** profile (the enumeration index is the seed for `order="random"`, so the result is
+reproducible). Keys: `order`, `n_runs`, `n_converged`, `n_not_converged`, `n_final_not_nash`, `max_steps`, `mean_steps`,
+`max_rounds_used`, `step_histogram`, `endpoints` (`profile`, `welfare`, `is_equilibrium`, `basin_size`, `share`; largest basin
+first), `n_endpoints`, `n_equilibria_unreached`. Non-convergence is reported, never hidden; for this model's exact-potential
+structure it never occurs (MODEL.md section 4).
+
+### 4.9 `sensitivity_variant` / `sensitivity_sweep` (additive)
+
+`parameter` is one of `"gamma"` (set `gamma = value >= 0`), `"compatibility_scale"` (every `w[i][j] * value`; symmetry is
+preserved) or `"preference_scale"` (every `pref[i][t] * value`). `sensitivity_variant` returns a deep copy; the scenario passed in is
+never modified. `sensitivity_sweep` solves each variant exhaustively and returns one row per value: `value`, `n_equilibria`,
+`optimal_welfare`, `n_optimal_profiles`, `n_stable_optima`, `best_equilibrium_welfare`, `worst_equilibrium_welfare`,
+`welfare_gap_best`, `welfare_gap_worst`, `largest_team_at_optimum`, `optimal_profile`. Variants are *what-if* models, never the baseline.
 
 ## 5. Worked example (hand-derived, then confirmed by running the engine)
 
