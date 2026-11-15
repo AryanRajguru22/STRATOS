@@ -435,8 +435,10 @@ def render_analysis_tab(bundle, engine, scenario: dict, profile: list, set_profi
         st.error(f"{b['n_not_converged']} run(s) did not converge and {b['n_final_not_nash']} ended in a non-equilibrium. "
                  "Under the model's assumptions this should not happen; treat the model inputs as suspect.")
     else:
-        st.success(f"All {b['n_runs']:,} runs converged, and every final assignment passes a fresh equilibrium check. "
-                   f"{b['n_equilibria_unreached']} of the {a['n_equilibria']} equilibria are not the end point of any start.", icon="✅")
+        reach = (f"Every one of the {a['n_equilibria']} equilibria is the end point of at least one start."
+                 if not b["n_equilibria_unreached"] else
+                 f"{b['n_equilibria_unreached']} of the {a['n_equilibria']} equilibria are never reached from any start.")
+        st.success(f"All {b['n_runs']:,} runs converged, and every final assignment passes a fresh equilibrium check. {reach}", icon="✅")
     st.plotly_chart(basin_chart(b, scenario, opt["welfare"]), width="stretch")
     st.caption(
         "Each bar is an equilibrium; its length is the number of starting assignments (out of all "
